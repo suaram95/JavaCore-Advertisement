@@ -1,10 +1,7 @@
 package advertisement;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.Advertisement;
-import advertisement.model.Category;
-import advertisement.model.Gender;
-import advertisement.model.User;
+import advertisement.model.*;
 import advertisement.storage.AdvertisementStorage;
 import advertisement.storage.UserStorage;
 
@@ -111,10 +108,10 @@ public class AdvertisementMain implements MainCommands, UserCommands {
                     printByCategory();
                     break;
                 case PRINT_ALL_ADS_BY_TITLE_SORT:
-                    //todo
+                    AD_STORAGE.sortAdsByTitle();
                     break;
                 case PRINT_ALL_ADS_BY_DATE_SORT:
-                    //todo
+                    AD_STORAGE.sortAdsByDate();
                     break;
                 case DELETE_MY_ALL_ADS:
                     AD_STORAGE.deleteAllAds();
@@ -129,25 +126,33 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         }
     }
 
-
-
     //User part
 
     private static void add() {
         System.out.println("To add an advertisement fill in the fields below.");
-        Advertisement advertisement = new Advertisement();
-        advertisement.setAuthor(logineduser);
-        System.out.print("Category: ");
-        advertisement.setCategory(Category.valueOf(SCANNER.nextLine().toUpperCase()));
-        System.out.print("Title: ");
-        advertisement.setTitle(SCANNER.nextLine());
-        System.out.print("Text: ");
-        advertisement.setText(SCANNER.nextLine());
-        System.out.print("Price: ");
-        advertisement.setPrice(Double.parseDouble(SCANNER.nextLine()));
-        advertisement.setCreatedDate(new Date());
-        AD_STORAGE.add(advertisement);
-        AD_STORAGE.print();
+        try {
+            Advertisement advertisement = new Advertisement();
+            advertisement.setAuthor(logineduser);
+            System.out.print("Category: ");
+            try {
+                advertisement.setCategory(Category.valueOf(SCANNER.nextLine().toUpperCase()));
+            } catch (IllegalArgumentException e){
+                System.out.println("Invalid category!");
+                add();
+            }
+            System.out.print("Title: ");
+            advertisement.setTitle(SCANNER.nextLine());
+            System.out.print("Text: ");
+            advertisement.setText(SCANNER.nextLine());
+            System.out.print("Price: ");
+            advertisement.setPrice(Double.parseDouble(SCANNER.nextLine()));
+            advertisement.setCreatedDate(new Date());
+            AD_STORAGE.add(advertisement);
+            AD_STORAGE.print();
+        } catch (Exception e) {
+            System.out.println("Invalid data!");
+            add();
+        }
     }
 
     private static void printByCategory() {
@@ -158,10 +163,21 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         } catch (ModelNotFoundException e) {
             e.getMessage();
             printByCategory();
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             System.out.println("Entered category does not exist!!");
             printByCategory();
         }
+    }
+
+    private static void sortAdsByTitle() {
+
+
+
+    }
+
+    private static void sortAdsByDate() {
+
+
     }
 
     private static void deleteAdByTitle() {

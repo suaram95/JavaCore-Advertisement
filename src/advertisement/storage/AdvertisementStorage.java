@@ -1,11 +1,13 @@
 package advertisement.storage;
 
 import advertisement.exceptions.ModelNotFoundException;
+import advertisement.model.AdsByDateComparator;
+import advertisement.model.AdsByTitleComparator;
 import advertisement.model.Advertisement;
 import advertisement.model.Category;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class AdvertisementStorage {
 
@@ -25,8 +27,8 @@ public class AdvertisementStorage {
         }
     }
 
-    public Category getByCategory(Category category) throws ModelNotFoundException {
-        for (Advertisement advertisement : adList) {
+    public void getByCategory(Category category) throws ModelNotFoundException {
+        for (Advertisement advertisement:adList) {
             if (advertisement.getCategory().equals(category)){
                 System.out.println(advertisement);
             }
@@ -46,5 +48,17 @@ public class AdvertisementStorage {
             }
         }
         throw new ModelNotFoundException(String.format("Advertisement with title $s does not exist",adTitle));
+    }
+
+    public void sortAdsByTitle() {
+        AdsByTitleComparator titleComparator=new AdsByTitleComparator();
+        adList.sort(titleComparator);
+        print();
+    }
+
+    public void sortAdsByDate() {
+        AdsByDateComparator dateComparator=new AdsByDateComparator();
+        adList.sort(dateComparator);
+        print();
     }
 }

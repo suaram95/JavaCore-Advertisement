@@ -11,7 +11,7 @@ public class Advertisement {
     private String text;
     private double price;
     private Date createdDate;
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-mm-yyyy hh:mm:ss");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy hh:mm:ss");
 
     public Advertisement(User author, Category category, String title, String text, double price, Date createdDate, SimpleDateFormat sdf) {
         this.author = author;
