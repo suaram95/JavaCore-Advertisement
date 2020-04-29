@@ -169,17 +169,6 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         }
     }
 
-    private static void sortAdsByTitle() {
-
-
-
-    }
-
-    private static void sortAdsByDate() {
-
-
-    }
-
     private static void deleteAdByTitle() {
         System.out.println("Input Advertisement title to delete");
         String adTitle = SCANNER.nextLine();
