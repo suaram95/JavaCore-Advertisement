@@ -4,7 +4,6 @@ import advertisement.exceptions.ModelNotFoundException;
 import advertisement.model.*;
 import advertisement.storage.AdvertisementStorage;
 import advertisement.storage.UserStorage;
-
 import java.util.Date;
 import java.util.Scanner;
 
@@ -162,7 +161,6 @@ public class AdvertisementMain implements MainCommands, UserCommands {
             AD_STORAGE.getByCategory(category);
         } catch (ModelNotFoundException e) {
             e.getMessage();
-            printByCategory();
         } catch (IllegalArgumentException e) {
             System.out.println("Entered category does not exist!!");
             printByCategory();
