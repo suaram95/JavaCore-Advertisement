@@ -47,7 +47,7 @@ public class AdvertisementStorage {
                 adList.clear();
             }
         }
-        throw new ModelNotFoundException(String.format("Advertisement with title $s does not exist",adTitle));
+        throw new ModelNotFoundException(String.format("Advertisement with title %s does not exist",adTitle));
     }
 
     public void sortAdsByTitle() {
@@ -60,5 +60,13 @@ public class AdvertisementStorage {
         AdsByDateComparator dateComparator=new AdsByDateComparator();
         adList.sort(dateComparator);
         print();
+    }
+
+    public void deleteAdsByAuthor(String authorName) {
+        for (Advertisement advertisement : adList) {
+            if (advertisement.getAuthor().equals(authorName)){
+                adList.remove(advertisement);
+            }
+        }
     }
 }

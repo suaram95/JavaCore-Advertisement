@@ -89,7 +89,11 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         while (isRun) {
             UserCommands.printUserCommands();
             int command;
-            command = Integer.parseInt(SCANNER.nextLine());
+            try {
+                command = Integer.parseInt(SCANNER.nextLine());
+            }catch (NumberFormatException e){
+                command=-1;
+            }
             switch (command) {
                 case LOGOUT:
                     isRun = false;
@@ -113,7 +117,7 @@ public class AdvertisementMain implements MainCommands, UserCommands {
                     AD_STORAGE.sortAdsByDate();
                     break;
                 case DELETE_MY_ALL_ADS:
-                    AD_STORAGE.deleteAllAds();
+                    deleteMyAllAds();
                     System.out.println("All advertisements are deleted!");
                     break;
                 case DELETE_AD_BY_TITLE:
@@ -167,6 +171,7 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         }
     }
 
+
     private static void deleteAdByTitle() {
         System.out.println("Input Advertisement title to delete");
         String adTitle = SCANNER.nextLine();
@@ -175,6 +180,12 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         } catch (ModelNotFoundException e) {
             e.getMessage();
         }
+    }
+
+    private static void deleteMyAllAds() {
+        System.out.println("Input Author name to delete adds");
+        String authorName = SCANNER.nextLine();
+        AD_STORAGE.deleteAdsByAuthor(authorName);
     }
 
 
