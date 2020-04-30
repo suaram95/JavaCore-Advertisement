@@ -77,8 +77,11 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         String userPhone = SCANNER.nextLine();
         System.out.print("Password: ");
         String userPassword = SCANNER.nextLine();
-
-//      logineduser = USER_STORAGE.getUserbyPhoneAndPassword(userPhone, userPassword);
+        try {
+            logineduser = USER_STORAGE.getUserbyPhoneAndPassword(userPhone, userPassword);
+        } catch (ModelNotFoundException e) {
+            e.getMessage();
+        }
         System.out.println("You succesfully entered your profile\n");
         loginedUserCommands();
 
