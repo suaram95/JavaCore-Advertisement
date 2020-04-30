@@ -1,7 +1,6 @@
 package advertisement.storage;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.Advertisement;
 import advertisement.model.User;
 
 import java.util.HashMap;
@@ -16,11 +15,11 @@ public class UserStorage {
     }
 
     public User getUserbyPhoneAndPassword(String phone, String password) throws ModelNotFoundException {
-        User user1 = userMap.get("PhoneNumber");
-        if (user1.getPhoneNumber().equals(phone)&& user1.getPassword().equals(password)){
-            return user1;
-        }
-        System.out.println("Hello");
+//        User user1 = userMap.get("PhoneNumber");
+//        if (user1.getPhoneNumber().equals(phone)&& user1.getPassword().equals(password)){
+//            return user1;
+//        }
+//        System.out.println("Hello");
         throw new ModelNotFoundException(String.format("User account with phone %s does not exist", phone));
     }
 

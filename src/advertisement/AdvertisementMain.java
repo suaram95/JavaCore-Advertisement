@@ -5,6 +5,7 @@ import advertisement.model.*;
 import advertisement.storage.AdvertisementStorage;
 import advertisement.storage.UserStorage;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class AdvertisementMain implements MainCommands, UserCommands {
@@ -114,10 +115,10 @@ public class AdvertisementMain implements MainCommands, UserCommands {
                     printByCategory();
                     break;
                 case PRINT_ALL_ADS_BY_TITLE_SORT:
-                    AD_STORAGE.sortAdsByTitle();
+                    sortAdsByTitle();
                     break;
                 case PRINT_ALL_ADS_BY_DATE_SORT:
-                    AD_STORAGE.sortAdsByDate();
+                    sortAdsByDate();
                     break;
                 case DELETE_MY_ALL_ADS:
                     deleteMyAllAds();
@@ -171,6 +172,26 @@ public class AdvertisementMain implements MainCommands, UserCommands {
         } catch (IllegalArgumentException e) {
             System.out.println("Entered category does not exist!!");
             printByCategory();
+        }
+    }
+
+    private static void sortAdsByDate() {
+        List<Advertisement> sortedListByDate = AD_STORAGE.getAdList();
+        if (sortedListByDate.size()>=2){
+            AD_STORAGE.sortAdsByDate();
+        } else {
+            System.out.println("You added only one advertisement, please add another for sorting");
+            add();
+        }
+    }
+
+    private static void sortAdsByTitle() {
+        List<Advertisement> sortedListByTitle = AD_STORAGE.getAdList();
+        if (sortedListByTitle.size()>=2){
+            AD_STORAGE.sortAdsByTitle();
+        } else {
+            System.out.println("You added only one advertisement, please add another for sorting");
+            add();
         }
     }
 
