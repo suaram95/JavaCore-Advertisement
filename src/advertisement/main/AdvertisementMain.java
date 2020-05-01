@@ -1,7 +1,10 @@
-package advertisement;
+package advertisement.main;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.*;
+import advertisement.model.Advertisement;
+import advertisement.model.Category;
+import advertisement.model.Gender;
+import advertisement.model.User;
 import advertisement.storage.AdvertisementStorage;
 import advertisement.storage.UserStorage;
 

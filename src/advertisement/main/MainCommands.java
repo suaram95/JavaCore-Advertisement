@@ -1,4 +1,4 @@
-package advertisement;
+package advertisement.main;
 
 public interface MainCommands {
 
