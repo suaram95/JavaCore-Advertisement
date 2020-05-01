@@ -4,16 +4,18 @@ import advertisement.exceptions.ModelNotFoundException;
 import advertisement.model.*;
 import advertisement.storage.AdvertisementStorage;
 import advertisement.storage.UserStorage;
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class AdvertisementMain implements MainCommands, UserCommands {
 
-    private static final Scanner SCANNER = new Scanner(System.in);
-    private static final AdvertisementStorage AD_STORAGE = new AdvertisementStorage();
-    private static final UserStorage USER_STORAGE = new UserStorage();
-    private static User logineduser;
+    private static Scanner scanner = new Scanner(System.in);
+    private static AdvertisementStorage advertisementStorage = new AdvertisementStorage();
+    private static UserStorage userStorage = new UserStorage();
+    private static User currentUser;
 
     public static void main(String[] args) {
         boolean isRun = true;
@@ -21,7 +23,7 @@ public class AdvertisementMain implements MainCommands, UserCommands {
             MainCommands.printMainCommands();
             int command;
             try {
-                command = Integer.parseInt(SCANNER.nextLine());
+                command = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 command = -1;
             }
@@ -31,10 +33,10 @@ public class AdvertisementMain implements MainCommands, UserCommands {
                     System.out.println("Program was closed");
                     break;
                 case LOGIN:
-                    login();
+                    loginUser();
                     break;
                 case REGISTER:
-                    register();
+                    registerUser();
                     break;
                 default:
                     System.err.println("Wrong Command!!");
@@ -44,59 +46,61 @@ public class AdvertisementMain implements MainCommands, UserCommands {
 
     //Main part
 
-    private static void register() {
+    private static void registerUser() {
         System.out.println("Input data for Registration");
         try {
             User user = new User();
             System.out.print("Name: ");
-            user.setName(SCANNER.nextLine());
+            user.setName(scanner.nextLine());
             System.out.print("Surname: ");
-            user.setSurname(SCANNER.nextLine());
+            user.setSurname(scanner.nextLine());
             System.out.print("Gender: ");
-            user.setGender(Gender.valueOf(SCANNER.nextLine().toUpperCase()));
+            user.setGender(Gender.valueOf(scanner.nextLine().toUpperCase()));
             System.out.print("Age: ");
-            user.setAge(Integer.parseInt(SCANNER.nextLine()));
+            user.setAge(Integer.parseInt(scanner.nextLine()));
             System.out.print("Phone Number: ");
-            user.setPhoneNumber(SCANNER.nextLine());
+            user.setPhoneNumber(scanner.nextLine());
             System.out.print("Password: ");
-            user.setPassword(SCANNER.nextLine());
-            USER_STORAGE.add(user);
+            user.setPassword(scanner.nextLine());
+            userStorage.add(user);
             System.out.println("Thanks you are Registered!");
         } catch (Exception e) {
             System.out.println("Invalid data!");
-            register();
+            registerUser();
         }
     }
 
-    private static void login() {
-        if (USER_STORAGE.isEmty()) {
+    private static void loginUser() {
+        if (userStorage.isEmty()) {
             System.out.println("Please Register first!");
             return;
         }
         System.out.println("Please input Phone Number & Password to Login");
         System.out.print("Phone Number: ");
-        String userPhone = SCANNER.nextLine();
+        String userPhone = scanner.nextLine();
         System.out.print("Password: ");
-        String userPassword = SCANNER.nextLine();
-        try {
-            logineduser = USER_STORAGE.getUserbyPhoneAndPassword(userPhone, userPassword);
-        } catch (ModelNotFoundException e) {
-            e.getMessage();
+        String userPassword = scanner.nextLine();
+        User user = userStorage.getUser(userPhone);
+        if (user != null && user.getPassword().equals(userPassword)) {
+            currentUser = user;
+            System.out.println("Welcome ! " + user.getName() + " " + user.getSurname());
+            loginedUser();
+        } else {
+            System.out.println("Ypu entered wrong Phone Number or password");
         }
-        System.out.println("You succesfully entered your profile\n");
-        loginedUserCommands();
+
 
     }
 
-    private static void loginedUserCommands() {
+    private static void loginedUser() {
         boolean isRun = true;
         while (isRun) {
             UserCommands.printUserCommands();
             int command;
             try {
-                command = Integer.parseInt(SCANNER.nextLine());
-            }catch (NumberFormatException e){
-                command=-1;
+                command = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                command = -1;
             }
             switch (command) {
                 case LOGOUT:
@@ -106,10 +110,10 @@ public class AdvertisementMain implements MainCommands, UserCommands {
                     add();
                     break;
                 case PRINT_MY_ALL_ADS:
-                    AD_STORAGE.print();
+                    advertisementStorage.printAdsByUser(currentUser);
                     break;
                 case PRINT_ALL_ADS:
-                    AD_STORAGE.print();
+                    advertisementStorage.print();
                     break;
                 case PRINT_AD_BY_CATEGORY:
                     printByCategory();
@@ -121,7 +125,7 @@ public class AdvertisementMain implements MainCommands, UserCommands {
                     sortAdsByDate();
                     break;
                 case DELETE_MY_ALL_ADS:
-                    deleteMyAllAds();
+                    advertisementStorage.deleteAdsByAuthor(currentUser);
                     System.out.println("All advertisements are deleted!");
                     break;
                 case DELETE_AD_BY_TITLE:
@@ -137,25 +141,26 @@ public class AdvertisementMain implements MainCommands, UserCommands {
 
     private static void add() {
         System.out.println("To add an advertisement fill in the fields below.");
+        System.out.println("Please choose category name from list: " + Arrays.toString(Category.values()));
         try {
             Advertisement advertisement = new Advertisement();
-            advertisement.setAuthor(logineduser);
+            advertisement.setAuthor(currentUser);
             System.out.print("Category: ");
             try {
-                advertisement.setCategory(Category.valueOf(SCANNER.nextLine().toUpperCase()));
-            } catch (IllegalArgumentException e){
+                advertisement.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
+            } catch (IllegalArgumentException e) {
                 System.out.println("Invalid category!");
                 add();
             }
             System.out.print("Title: ");
-            advertisement.setTitle(SCANNER.nextLine());
+            advertisement.setTitle(scanner.nextLine());
             System.out.print("Text: ");
-            advertisement.setText(SCANNER.nextLine());
+            advertisement.setText(scanner.nextLine());
             System.out.print("Price: ");
-            advertisement.setPrice(Double.parseDouble(SCANNER.nextLine()));
+            advertisement.setPrice(Double.parseDouble(scanner.nextLine()));
             advertisement.setCreatedDate(new Date());
-            AD_STORAGE.add(advertisement);
-            AD_STORAGE.print();
+            advertisementStorage.add(advertisement);
+            advertisementStorage.print();
         } catch (Exception e) {
             System.out.println("Invalid data!");
             add();
@@ -163,10 +168,10 @@ public class AdvertisementMain implements MainCommands, UserCommands {
     }
 
     private static void printByCategory() {
-        System.out.println("Input name of Category to see advertisements");
+        System.out.println("Please choose category name from list: " + Arrays.toString(Category.values()));
         try {
-            Category category = Category.valueOf(SCANNER.nextLine().toUpperCase());
-            AD_STORAGE.getByCategory(category);
+            Category category = Category.valueOf(scanner.nextLine().toUpperCase());
+            advertisementStorage.getByCategory(category);
         } catch (ModelNotFoundException e) {
             e.getMessage();
         } catch (IllegalArgumentException e) {
@@ -176,9 +181,9 @@ public class AdvertisementMain implements MainCommands, UserCommands {
     }
 
     private static void sortAdsByDate() {
-        List<Advertisement> sortedListByDate = AD_STORAGE.getAdList();
-        if (sortedListByDate.size()>=2){
-            AD_STORAGE.sortAdsByDate();
+        List<Advertisement> sortedListByDate = advertisementStorage.getAdList();
+        if (sortedListByDate.size() >= 2) {
+            advertisementStorage.sortAdsByDate();
         } else {
             System.out.println("You added only one advertisement, please add another for sorting");
             add();
@@ -186,9 +191,9 @@ public class AdvertisementMain implements MainCommands, UserCommands {
     }
 
     private static void sortAdsByTitle() {
-        List<Advertisement> sortedListByTitle = AD_STORAGE.getAdList();
-        if (sortedListByTitle.size()>=2){
-            AD_STORAGE.sortAdsByTitle();
+        List<Advertisement> sortedListByTitle = advertisementStorage.getAdList();
+        if (sortedListByTitle.size() >= 2) {
+            advertisementStorage.sortAdsByTitle();
         } else {
             System.out.println("You added only one advertisement, please add another for sorting");
             add();
@@ -198,20 +203,15 @@ public class AdvertisementMain implements MainCommands, UserCommands {
 
     private static void deleteAdByTitle() {
         System.out.println("Input Advertisement title to delete");
-        String adTitle = SCANNER.nextLine();
-        try {
-            AD_STORAGE.deleteAdByTitle(adTitle);
-        } catch (ModelNotFoundException e) {
-            e.getMessage();
+        advertisementStorage.printAdsByUser(currentUser);
+        String advTitle = scanner.nextLine();
+        Advertisement advbyTitle = advertisementStorage.getByTitle(advTitle);
+        if (advbyTitle != null && advbyTitle.getAuthor().equals(currentUser)) {
+            advertisementStorage.deleteAdByTitle(advbyTitle);
+        } else {
+            System.out.println("Wrong title!");
         }
     }
-
-    private static void deleteMyAllAds() {
-        System.out.println("Input Author name to delete adds");
-        String authorName = SCANNER.nextLine();
-        AD_STORAGE.deleteAdsByAuthor(authorName);
-    }
-
 
 }
 

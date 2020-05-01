@@ -14,14 +14,11 @@ public class UserStorage {
         userMap.put(user.getPhoneNumber(), user);
     }
 
-    public User getUserbyPhoneAndPassword(String phone, String password) throws ModelNotFoundException {
-//        User user1 = userMap.get("PhoneNumber");
-//        if (user1.getPhoneNumber().equals(phone)&& user1.getPassword().equals(password)){
-//            return user1;
-//        }
-//        System.out.println("Hello");
-        throw new ModelNotFoundException(String.format("User account with phone %s does not exist", phone));
+    public User getUser(String phoneNumber){
+        return userMap.get(phoneNumber);
     }
+
+
 
     public void printUsers() {
         for (User user : userMap.values()) {

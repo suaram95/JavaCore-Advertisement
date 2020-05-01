@@ -103,7 +103,6 @@ public class User {
                 ", gender=" + gender +
                 ", age=" + age +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 

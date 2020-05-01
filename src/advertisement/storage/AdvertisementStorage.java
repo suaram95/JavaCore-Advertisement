@@ -1,12 +1,10 @@
 package advertisement.storage;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.AdsByDateComparator;
-import advertisement.model.AdsByTitleComparator;
-import advertisement.model.Advertisement;
-import advertisement.model.Category;
+import advertisement.model.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -34,25 +32,15 @@ public class AdvertisementStorage {
 
     public void getByCategory(Category category) throws ModelNotFoundException {
         for (Advertisement advertisement : adList) {
-            if (advertisement.getCategory().equals(category)) {
+            if (advertisement.getCategory()==category) {
                 System.out.println(advertisement);
             }
         }
         throw new ModelNotFoundException(String.format("Advertisement with category %s dows not exist", category));
     }
 
-    public void deleteAllAds() {
-        adList.clear();
-    }
-
-
-    public void deleteAdByTitle(String adTitle) throws ModelNotFoundException {
-        for (Advertisement advertisement : adList) {
-            if (advertisement.getTitle().equals(adTitle)) {
-                adList.clear();
-            }
-        }
-        throw new ModelNotFoundException(String.format("Advertisement with title %s does not exist", adTitle));
+    public void deleteAdByTitle(Advertisement adTitle)  {
+        adList.removeIf(advertisement -> advertisement.getTitle().equals(adTitle));
     }
 
     public void sortAdsByTitle() {
@@ -67,11 +55,24 @@ public class AdvertisementStorage {
         print();
     }
 
-    public void deleteAdsByAuthor(String authorName) {
+    public void deleteAdsByAuthor(User user) {
+        adList.removeIf(next -> next.getAuthor().equals(user));
+    }
+
+    public void printAdsByUser(User user) {
         for (Advertisement advertisement : adList) {
-            if (advertisement.getAuthor().equals(authorName)) {
-                adList.remove(advertisement);
+            if (advertisement.getAuthor().equals(user)){
+                System.out.println(advertisement);
             }
         }
+    }
+
+    public Advertisement getByTitle(String advTitle) {
+        for (Advertisement advertisement : adList) {
+            if (advertisement.getTitle().equals(advTitle)){
+                return advertisement;
+            }
+        }
+        return null;
     }
 }

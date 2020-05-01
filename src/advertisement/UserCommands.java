@@ -13,7 +13,7 @@ public interface UserCommands {
     int DELETE_AD_BY_TITLE = 8;
 
     static void printUserCommands() {
-        System.out.println("Input " + LOGOUT + " to EXIT");
+        System.out.println("Input " + LOGOUT + " to LOGOUT");
         System.out.println("Input " + ADD_NEW_AD + " to ADD NEW ADD");
         System.out.println("Input " + PRINT_MY_ALL_ADS + " to PRINT MY ALL ADS");
         System.out.println("Input " + PRINT_ALL_ADS + " to PRINT ALL ADS");
