@@ -1,5 +1,6 @@
 package advertisement.model;
 
+
 public enum Category {
 
     HOUSES,
@@ -12,4 +13,6 @@ public enum Category {
     MATERIALS,
     SERVICES,
     JOBS,
+
+
 }
