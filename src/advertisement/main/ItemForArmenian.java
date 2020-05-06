@@ -24,7 +24,7 @@ public class ItemForArmenian implements Commands {
     public static void mainPart() {
         try {
             userStorage.initData();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         boolean isRun = true;
@@ -105,7 +105,7 @@ public class ItemForArmenian implements Commands {
     private static void loginedUser() {
         try {
             itemStorage.initData();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         boolean isRun = true;

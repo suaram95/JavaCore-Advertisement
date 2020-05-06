@@ -1,6 +1,5 @@
 package advertisement.storage;
 
-import advertisement.exceptions.ModelNotFoundException;
 import advertisement.model.User;
 import advertisement.util.UserFileUtil;
 
@@ -22,11 +21,17 @@ public class UserStorage {
         }
     }
 
-    public void initData() {
-        try {
+    public void initData() throws IOException, ClassNotFoundException {
+        File file=new File("D:\\Aram\\IT Space LLC\\My Projects\\JavaCore-Advertisement\\src\\advertisement\\util\\dataFiles\\UserData.txt");
+        if (!file.exists()){
+            boolean newFile = file.createNewFile();
+            if (newFile){
+                System.out.println("In package <dataFiles> was created file <UserData.txt>");
+            } else{
+                System.err.println("Something went wrong! File was not created");
+            }
+        } else  {
             userMap = UserFileUtil.deserializeUserMap();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }

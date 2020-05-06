@@ -8,6 +8,7 @@ import advertisement.model.User;
 import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ItemForRussian implements Commands {
     public static void mainPart() {
         try {
             userStorage.initData();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         boolean isRun = true;
@@ -102,7 +103,7 @@ public class ItemForRussian implements Commands {
     private static void loginedUser() {
         try {
             itemStorage.initData();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         boolean isRun = true;

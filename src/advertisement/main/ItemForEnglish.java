@@ -26,7 +26,7 @@ public class ItemForEnglish implements Commands {
         while (isRun) {
             try {
                 userStorage.initData();
-            } catch (Exception e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
             Commands.printMainCommandsEng();

@@ -4,6 +4,7 @@ import advertisement.exceptions.ModelNotFoundException;
 import advertisement.model.*;
 import advertisement.util.ItemFileUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class ItemStorage {
 
-    private static long itemId=1;
+    private static long itemId = 1;
 
     private List<Item> items = new ArrayList<>();
 
@@ -27,9 +28,9 @@ public class ItemStorage {
         }
     }
 
-    public Item getItemById(long id){
+    public Item getItemById(long id) {
         for (Item item : items) {
-            if (item.getId()==id){
+            if (item.getId() == id) {
                 return item;
             }
         }
@@ -37,11 +38,21 @@ public class ItemStorage {
     }
 
     public void initData() throws IOException, ClassNotFoundException {
-        items = ItemFileUtil.deserializeItemList();
+        File file = new File("D:\\Aram\\IT Space LLC\\My Projects\\JavaCore-Advertisement\\src\\advertisement\\util\\dataFiles\\ItemData.txt");
+        if (!file.exists()) {
+            boolean newFile = file.createNewFile();
+            if (newFile) {
+                System.out.println("In package <dataFiles> was created file <ItemData.txt>");
+            } else {
+                System.err.println("Something went wrong! File was not created");
+            }
+        } else {
+            items = ItemFileUtil.deserializeItemList();
+        }
     }
 
 
-        public boolean isEmpty() {
+    public boolean isEmpty() {
         return this.items.isEmpty();
     }
 
@@ -102,7 +113,7 @@ public class ItemStorage {
 //        items.removeIf(item -> item.getUser().equals(user));
     }
 
-    public void deleteItemsById(long id){
+    public void deleteItemsById(long id) {
         items.remove(getItemById(id));
         try {
             ItemFileUtil.seializeItemList(items);
