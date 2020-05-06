@@ -1,26 +1,32 @@
 package advertisement.main;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.Advertisement;
+import advertisement.model.Item;
 import advertisement.model.Category;
 import advertisement.model.Gender;
 import advertisement.model.User;
-import advertisement.storage.AdvertisementStorage;
+import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class AdvertisementForArmenian implements Commands {
+public class ItemForArmenian implements Commands {
 
     private static Scanner scanner = new Scanner(System.in);
-    private static AdvertisementStorage advertisementStorage = new AdvertisementStorage();
+    private static ItemStorage itemStorage = new ItemStorage();
     private static UserStorage userStorage = new UserStorage();
     private static User currentUser;
 
     public static void mainPart() {
+        try {
+            userStorage.initData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         boolean isRun = true;
         while (isRun) {
             Commands.printMainCommandsArm();
@@ -76,9 +82,9 @@ public class AdvertisementForArmenian implements Commands {
     private static void loginUser() {
         if (userStorage.isEmty()) {
             System.out.println("Խնդրում ենք սկզբից գրանցվեք!");
-            return;
+            registerUser();
         }
-        System.out.println("Խնդրում ենք մուտքագրել Հեռախոսահամարը և Գաղտանաբառը");
+        System.out.println("Խնդրում ենք մուտքագրել Հեռախոսահամարը և Գաղտնաբառը");
         System.out.print("Հեռախոսահամար: ");
         String userPhone = scanner.nextLine();
         System.out.print("Գաղտանաբառ: ");
@@ -89,13 +95,19 @@ public class AdvertisementForArmenian implements Commands {
             System.out.println("\nԲարի Գալուստ ! " + user.getName() + " " + user.getSurname()+"\n");
             loginedUser();
         } else {
-            System.out.println("Մուտքագրված Հեռախոսահամարը կամ գաղտնաբառը սխալ է");
+            System.out.println("Մուտքագրված Հեռախոսահամարը կամ գաղտնաբառը սխալ է, կրկին փորձեք");
+            loginUser();
         }
 
 
     }
 
     private static void loginedUser() {
+        try {
+            itemStorage.initData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         boolean isRun = true;
         while (isRun) {
             Commands.printUserCommandsArm();
@@ -113,10 +125,10 @@ public class AdvertisementForArmenian implements Commands {
                     add();
                     break;
                 case PRINT_MY_ALL_ADS:
-                    advertisementStorage.printAdsByUser(currentUser);
+                    itemStorage.printAdsByUser(currentUser);
                     break;
                 case PRINT_ALL_ADS:
-                    advertisementStorage.print();
+                    itemStorage.print();
                     break;
                 case PRINT_AD_BY_CATEGORY:
                     printByCategory();
@@ -128,11 +140,11 @@ public class AdvertisementForArmenian implements Commands {
                     sortAdsByDate();
                     break;
                 case DELETE_MY_ALL_ADS:
-                    advertisementStorage.deleteAdsByAuthor(currentUser);
+                    itemStorage.deleteAdsByAuthor(currentUser);
                     System.out.println("Բոլոր հայտարարությունները հեռացված են!");
                     break;
                 case DELETE_AD_BY_TITLE:
-                    deleteAdByTitle();
+                    deleteById();
                     break;
                 default:
                     System.err.println("Սխալ հրաման!!");
@@ -146,24 +158,24 @@ public class AdvertisementForArmenian implements Commands {
         System.out.println("Հայտարարությունը ավելացնելու համար լրացրեք հետևյալ դաշտերը");
         System.out.println("Խնդրում ենք ընտրել կատեգորիան հետևյալ ցուցակից: " + Arrays.toString(Category.values()));
         try {
-            Advertisement advertisement = new Advertisement();
-            advertisement.setAuthor(currentUser);
+            Item item = new Item();
+            item.setAuthor(currentUser);
             System.out.print("Կատեգորիա: ");
             try {
-                advertisement.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
+                item.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
             } catch (IllegalArgumentException e) {
                 System.out.println("Սխալ կատեգորիա!");
                 add();
             }
             System.out.print("Վերանգիր: ");
-            advertisement.setTitle(scanner.nextLine());
+            item.setTitle(scanner.nextLine());
             System.out.print("Տեքստ: ");
-            advertisement.setText(scanner.nextLine());
+            item.setText(scanner.nextLine());
             System.out.print("Գին: ");
-            advertisement.setPrice(Double.parseDouble(scanner.nextLine()));
-            advertisement.setCreatedDate(new Date());
-            advertisementStorage.add(advertisement);
-            advertisementStorage.print();
+            item.setPrice(Double.parseDouble(scanner.nextLine()));
+            item.setCreatedDate(new Date());
+            itemStorage.add(item);
+            itemStorage.print();
         } catch (Exception e) {
             System.out.println("Սխալ տվյալ!");
             add();
@@ -174,7 +186,7 @@ public class AdvertisementForArmenian implements Commands {
         System.out.println("Խնդրում ենք ընտրել կատեգորիան հետևյալ ցուցակից: " + Arrays.toString(Category.values()));
         try {
             Category category = Category.valueOf(scanner.nextLine().toUpperCase());
-            advertisementStorage.getByCategory(category);
+            itemStorage.getByCategory(category);
         } catch (ModelNotFoundException e) {
             e.getMessage();
         } catch (IllegalArgumentException e) {
@@ -184,9 +196,9 @@ public class AdvertisementForArmenian implements Commands {
     }
 
     private static void sortAdsByDate() {
-        List<Advertisement> sortedListByDate = advertisementStorage.getAdList();
+        List<Item> sortedListByDate = itemStorage.getItems();
         if (sortedListByDate.size() >= 2) {
-            advertisementStorage.sortAdsByDate();
+            itemStorage.sortAdsByDate();
         } else {
             System.out.println("Դուք ավելացրել եք միայն մեկ հայտարարություն, խնդրում ենք ավելացնել մեկ ուրիշը, տեսակավորելու համար");
             add();
@@ -194,9 +206,9 @@ public class AdvertisementForArmenian implements Commands {
     }
 
     private static void sortAdsByTitle() {
-        List<Advertisement> sortedListByTitle = advertisementStorage.getAdList();
+        List<Item> sortedListByTitle = itemStorage.getItems();
         if (sortedListByTitle.size() >= 2) {
-            advertisementStorage.sortAdsByTitle();
+            itemStorage.sortAdsByTitle();
         } else {
             System.out.println("Դուք ավելացրել եք միայն մեկ հայտարարություն, խնդրում ենք ավելացնել մեկ ուրիշը, տեսակավորելու համար");
             add();
@@ -204,15 +216,15 @@ public class AdvertisementForArmenian implements Commands {
     }
 
 
-    private static void deleteAdByTitle() {
-        System.out.println("Մուտքագրեք հայտարարության վերանգիրը ջնջելու համար");
-        advertisementStorage.printAdsByUser(currentUser);
-        String advTitle = scanner.nextLine();
-        Advertisement advbyTitle = advertisementStorage.getByTitle(advTitle);
-        if (advbyTitle != null && advbyTitle.getAuthor().equals(currentUser)) {
-            advertisementStorage.deleteAdByTitle(advbyTitle);
+    private static void deleteById() {
+        System.out.println("Մուտքագրեք հայտարարության ID-ն, այն ջնջելու համար");
+        itemStorage.printAdsByUser(currentUser);
+        long id = Long.parseLong(scanner.nextLine());
+        Item itemById = itemStorage.getItemById(id);
+        if (itemById!=null && itemById.getAuthor().equals(currentUser)){
+            itemStorage.deleteItemsById(id);
         } else {
-            System.out.println("Մուտքագրված վերանգիրը սխալ է!");
+            System.out.println("Սխալ ID!");
         }
     }
 

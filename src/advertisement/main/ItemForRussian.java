@@ -1,11 +1,11 @@
 package advertisement.main;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.Advertisement;
+import advertisement.model.Item;
 import advertisement.model.Category;
 import advertisement.model.Gender;
 import advertisement.model.User;
-import advertisement.storage.AdvertisementStorage;
+import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
 
 import java.util.Arrays;
@@ -13,14 +13,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class AdvertisementForRussian implements Commands {
+public class ItemForRussian implements Commands {
 
     private static Scanner scanner = new Scanner(System.in);
-    private static AdvertisementStorage advertisementStorage = new AdvertisementStorage();
+    private static ItemStorage itemStorage = new ItemStorage();
     private static UserStorage userStorage = new UserStorage();
     private static User currentUser;
 
     public static void mainPart() {
+        try {
+            userStorage.initData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         boolean isRun = true;
         while (isRun) {
             Commands.printMainCommandsRus();
@@ -76,7 +81,7 @@ public class AdvertisementForRussian implements Commands {
     private static void loginUser() {
         if (userStorage.isEmty()) {
             System.out.println("Пожалуйста сперва регистрируйтесь!");
-            return;
+            registerUser();
         }
         System.out.println("Пожалуйста введите Тел.Номер и Пароль для входа");
         System.out.print("Тел.Номер: ");
@@ -89,11 +94,17 @@ public class AdvertisementForRussian implements Commands {
             System.out.println("\nДобро Пажаловать ! " + user.getName() + " " + user.getSurname()+"\n");
             loginedUser();
         } else {
-            System.out.println("Вы ввели неправилний Тел.Номер или Пароль");
+            System.out.println("Вы ввели неправилний Тел.Номер или Пароль, попробуйте снова");
+            loginUser();
         }
     }
 
     private static void loginedUser() {
+        try {
+            itemStorage.initData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         boolean isRun = true;
         while (isRun) {
             Commands.printUserCommandsRus();
@@ -111,10 +122,10 @@ public class AdvertisementForRussian implements Commands {
                     add();
                     break;
                 case PRINT_MY_ALL_ADS:
-                    advertisementStorage.printAdsByUser(currentUser);
+                    itemStorage.printAdsByUser(currentUser);
                     break;
                 case PRINT_ALL_ADS:
-                    advertisementStorage.print();
+                    itemStorage.print();
                     break;
                 case PRINT_AD_BY_CATEGORY:
                     printByCategory();
@@ -126,11 +137,11 @@ public class AdvertisementForRussian implements Commands {
                     sortAdsByDate();
                     break;
                 case DELETE_MY_ALL_ADS:
-                    advertisementStorage.deleteAdsByAuthor(currentUser);
+                    itemStorage.deleteAdsByAuthor(currentUser);
                     System.out.println("Все обьявления удалены!");
                     break;
                 case DELETE_AD_BY_TITLE:
-                    deleteAdByTitle();
+                    deleteById();
                     break;
                 default:
                     System.err.println("Неверная команда!!");
@@ -144,24 +155,24 @@ public class AdvertisementForRussian implements Commands {
         System.out.println("Для добавления обьявления заполните следуюшие поля");
         System.out.println("Пожалуйста выберите категорию из этого листа: " + Arrays.toString(Category.values()));
         try {
-            Advertisement advertisement = new Advertisement();
-            advertisement.setAuthor(currentUser);
+            Item item = new Item();
+            item.setAuthor(currentUser);
             System.out.print("Категория: ");
             try {
-                advertisement.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
+                item.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
             } catch (IllegalArgumentException e) {
                 System.out.println("Неверная категория!");
                 add();
             }
             System.out.print("Заголовка: ");
-            advertisement.setTitle(scanner.nextLine());
+            item.setTitle(scanner.nextLine());
             System.out.print("Текст: ");
-            advertisement.setText(scanner.nextLine());
+            item.setText(scanner.nextLine());
             System.out.print("Цена: ");
-            advertisement.setPrice(Double.parseDouble(scanner.nextLine()));
-            advertisement.setCreatedDate(new Date());
-            advertisementStorage.add(advertisement);
-            advertisementStorage.print();
+            item.setPrice(Double.parseDouble(scanner.nextLine()));
+            item.setCreatedDate(new Date());
+            itemStorage.add(item);
+            itemStorage.print();
         } catch (Exception e) {
             System.out.println("Неверная команда!!");
             add();
@@ -172,7 +183,7 @@ public class AdvertisementForRussian implements Commands {
         System.out.println("Пожалуйста выберите категорию из этого листа: " + Arrays.toString(Category.values()));
         try {
             Category category = Category.valueOf(scanner.nextLine().toUpperCase());
-            advertisementStorage.getByCategory(category);
+            itemStorage.getByCategory(category);
         } catch (ModelNotFoundException e) {
             e.getMessage();
         } catch (IllegalArgumentException e) {
@@ -182,9 +193,9 @@ public class AdvertisementForRussian implements Commands {
     }
 
     private static void sortAdsByDate() {
-        List<Advertisement> sortedListByDate = advertisementStorage.getAdList();
+        List<Item> sortedListByDate = itemStorage.getItems();
         if (sortedListByDate.size() >= 2) {
-            advertisementStorage.sortAdsByDate();
+            itemStorage.sortAdsByDate();
         } else {
             System.out.println("Вы добавили только одно обьявление, пожалуйста добавьте еще одну для сортировки");
             add();
@@ -192,9 +203,9 @@ public class AdvertisementForRussian implements Commands {
     }
 
     private static void sortAdsByTitle() {
-        List<Advertisement> sortedListByTitle = advertisementStorage.getAdList();
+        List<Item> sortedListByTitle = itemStorage.getItems();
         if (sortedListByTitle.size() >= 2) {
-            advertisementStorage.sortAdsByTitle();
+            itemStorage.sortAdsByTitle();
         } else {
             System.out.println("Вы добавили только одно обьявление, пожалуйста добавьте еще одну для сортировки");
             add();
@@ -202,15 +213,16 @@ public class AdvertisementForRussian implements Commands {
     }
 
 
-    private static void deleteAdByTitle() {
-        System.out.println("Вводите заголовок категории для удаления");
-        advertisementStorage.printAdsByUser(currentUser);
-        String advTitle = scanner.nextLine();
-        Advertisement advbyTitle = advertisementStorage.getByTitle(advTitle);
-        if (advbyTitle != null && advbyTitle.getAuthor().equals(currentUser)) {
-            advertisementStorage.deleteAdByTitle(advbyTitle);
+    private static void deleteById() {
+
+        System.out.println("Вводите ID обьявления для удаления");
+        itemStorage.printAdsByUser(currentUser);
+        long id = Long.parseLong(scanner.nextLine());
+        Item itemById = itemStorage.getItemById(id);
+        if (itemById!=null && itemById.getAuthor().equals(currentUser)){
+            itemStorage.deleteItemsById(id);
         } else {
-            System.out.println("Неверний заголовок!");
+            System.out.println("Неверний ID!");
         }
     }
 

@@ -1,10 +1,12 @@
 package advertisement.model;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Advertisement {
+public class Item implements Serializable {
 
+    private long id;
     private User author;
     private Category category;
     private String title;
@@ -13,7 +15,8 @@ public class Advertisement {
     private Date createdDate;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy hh:mm:ss");
 
-    public Advertisement(User author, Category category, String title, String text, double price, Date createdDate, SimpleDateFormat sdf) {
+    public Item(long id, User author, Category category, String title, String text, double price, Date createdDate, SimpleDateFormat sdf) {
+        this.id = id;
         this.author = author;
         this.category = category;
         this.title = title;
@@ -23,7 +26,15 @@ public class Advertisement {
         this.sdf = sdf;
     }
 
-    public Advertisement() {
+    public Item() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public User getAuthor() {
@@ -87,8 +98,9 @@ public class Advertisement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Advertisement that = (Advertisement) o;
+        Item that = (Item) o;
 
+        if (id != that.id) return false;
         if (Double.compare(that.price, price) != 0) return false;
         if (author != null ? !author.equals(that.author) : that.author != null) return false;
         if (category != that.category) return false;
@@ -102,7 +114,8 @@ public class Advertisement {
     public int hashCode() {
         int result;
         long temp;
-        result = author != null ? author.hashCode() : 0;
+        result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (author != null ? author.hashCode() : 0);
         result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
@@ -116,12 +129,14 @@ public class Advertisement {
     @Override
     public String toString() {
         return "Advertisement{" +
-                "author=" + author +
+                "id=" + id +
+                ", author=" + author +
                 ", category=" + category +
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
                 ", price=" + price +
-                ", Date=" + sdf.format(createdDate) +
+                ", createdDate=" + createdDate +
+                ", sdf=" + sdf +
                 '}';
     }
 }

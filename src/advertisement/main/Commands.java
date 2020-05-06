@@ -28,6 +28,10 @@ public interface Commands {
         System.out.println("Հայերենի համար սեղմեք: " + ARMENIAN);
         System.out.println("For English input: " + ENGLISH);
         System.out.println("Для русского языка нажмите: " + RUSSIAN);
+        System.out.println("----------------------------------------");
+        System.out.println("Դուրս գալու համար սեղմեք: "+EXIT);
+        System.out.println("For Exit input: "+EXIT);
+        System.out.println("Для выхода нажмите: "+EXIT);
     }
 
 
@@ -48,7 +52,7 @@ public interface Commands {
         System.out.println("Սեղմեք " + PRINT_ALL_ADS_BY_TITLE_SORT + " հայտարարությունները ըստ վերնագրերի տեսակավորելու համար");
         System.out.println("Սեղմեք " + PRINT_ALL_ADS_BY_DATE_SORT + " հայտարարությունները ըստ ավելացման օրվա տեսակավորելու համար");
         System.out.println("Սեղմեք " + DELETE_MY_ALL_ADS + " ձեր բոլոր հայտարարությունները ջնջելու համար");
-        System.out.println("Սեղմեք " + DELETE_AD_BY_TITLE + " հայտարարաությունը ըստ տրված վերնագրի ջնջելու համար");
+        System.out.println("Սեղմեք " + DELETE_AD_BY_TITLE + " հայտարարաությունը ըստ տրված ID-ի");
     }
 
 
@@ -69,7 +73,7 @@ public interface Commands {
         System.out.println("Input " + PRINT_ALL_ADS_BY_TITLE_SORT + " to sort all Advetisement by title");
         System.out.println("Input " + PRINT_ALL_ADS_BY_DATE_SORT + " to sort all Advetisement by date");
         System.out.println("Input " + DELETE_MY_ALL_ADS + " to delete your all Advertisements");
-        System.out.println("Input " + DELETE_AD_BY_TITLE + " to delete Advertisement by given title");
+        System.out.println("Input " + DELETE_AD_BY_TITLE + " to delete Advertisement by given ID");
     }
 
     //Russian part
@@ -89,7 +93,7 @@ public interface Commands {
         System.out.println("Нажмите " + PRINT_ALL_ADS_BY_TITLE_SORT + " для сортировки обьявлений по заголовкам");
         System.out.println("Нажмите " + PRINT_ALL_ADS_BY_DATE_SORT + " для сортировки обьявлений по числу добавления");
         System.out.println("Нажмите " + DELETE_MY_ALL_ADS + " для удаления всех ваших обьявлений");
-        System.out.println("Нажмите " + DELETE_AD_BY_TITLE + " для удаления обьявлений по заданному заголовку");
+        System.out.println("Нажмите " + DELETE_AD_BY_TITLE + " для удаления обьявлений по заданному ID");
     }
 
 }

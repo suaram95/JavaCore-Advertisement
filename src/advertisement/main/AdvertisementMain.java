@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class AdvertisementMain implements Commands {
 
-    private static Scanner scanner=new Scanner(System.in);
+    private static final Scanner scanner=new Scanner(System.in);
 
     public static void main(String[] args) {
         boolean isRun=true;
@@ -19,7 +19,6 @@ public class AdvertisementMain implements Commands {
             switch (command){
                 case EXIT:
                     isRun=false;
-                    System.out.println("GoodBye");
                     break;
                 case ARMENIAN:
                    chooseArmenian();
@@ -37,14 +36,14 @@ public class AdvertisementMain implements Commands {
     }
 
     private static void chooseArmenian() {
-        AdvertisementForArmenian.mainPart();
+        ItemForArmenian.mainPart();
     }
 
     private static void chooseEnglish() {
-        AdvertisementForEnglish.mainPart();
+        ItemForEnglish.mainPart();
     }
 
     private static void chooseRussian() {
-        AdvertisementForRussian.mainPart();
+        ItemForRussian.mainPart();
     }
 }
