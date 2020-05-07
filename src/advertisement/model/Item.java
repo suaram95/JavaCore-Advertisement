@@ -135,8 +135,7 @@ public class Item implements Serializable {
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
                 ", price=" + price +
-                ", createdDate=" + createdDate +
-                ", sdf=" + sdf +
+                ", createdDate=" + sdf.format(createdDate) +
                 '}';
     }
 }

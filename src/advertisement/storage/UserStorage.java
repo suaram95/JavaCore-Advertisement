@@ -21,16 +21,17 @@ public class UserStorage {
         }
     }
 
+
     public void initData() throws IOException, ClassNotFoundException {
-        File file=new File("D:\\Aram\\IT Space LLC\\My Projects\\JavaCore-Advertisement\\src\\advertisement\\util\\dataFiles\\UserData.txt");
-        if (!file.exists()){
+        File file = new File("D:\\Aram\\IT Space LLC\\My Projects\\JavaCore-Advertisement\\src\\advertisement\\util\\dataFiles\\UserData.txt");
+        if (!file.exists()) {
             boolean newFile = file.createNewFile();
             if (newFile){
-                System.out.println("In package <dataFiles> was created file <UserData.txt>");
-            } else{
-                System.err.println("Something went wrong! File was not created");
+                System.out.println("Your data will be saved in storage");
+            } else {
+                System.err.println("Something went wrong!! Catch errors and restart program");
             }
-        } else  {
+        } else {
             userMap = UserFileUtil.deserializeUserMap();
         }
 

@@ -24,7 +24,7 @@ public class ItemForArmenian implements Commands {
     public static void mainPart() {
         try {
             userStorage.initData();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         boolean isRun = true;
@@ -71,12 +71,19 @@ public class ItemForArmenian implements Commands {
             user.setPhoneNumber(scanner.nextLine());
             System.out.print("Գաղտնաբառ: ");
             user.setPassword(scanner.nextLine());
-            userStorage.add(user);
-            System.out.println("\nՇնորհակալություն, դուք գրանցված եք!\n");
+            if (userStorage.getUser(user.getPhoneNumber())!=null){
+                System.out.println(user.getPhoneNumber()+"հեռախոսահամարով օգտատեր արդեն գոյութոյւն ունի");
+                registerUser();
+            } else {
+                userStorage.add(user);
+                System.out.println("\nՇնորհակալություն դուք գրանցված եք!\n");
+                userStorage.printUsers();
+            }
         } catch (Exception e) {
             System.out.println("Սխալ տվյալ!");
             registerUser();
         }
+
     }
 
     private static void loginUser() {
@@ -92,7 +99,7 @@ public class ItemForArmenian implements Commands {
         User user = userStorage.getUser(userPhone);
         if (user != null && user.getPassword().equals(userPassword)) {
             currentUser = user;
-            System.out.println("\nԲարի Գալուստ ! " + user.getName() + " " + user.getSurname()+"\n");
+            System.out.println("\nԲարի Գալուստ ! " + user.getName() + " " + user.getSurname() + "\n");
             loginedUser();
         } else {
             System.out.println("Մուտքագրված Հեռախոսահամարը կամ գաղտնաբառը սխալ է, կրկին փորձեք");
@@ -221,7 +228,7 @@ public class ItemForArmenian implements Commands {
         itemStorage.printAdsByUser(currentUser);
         long id = Long.parseLong(scanner.nextLine());
         Item itemById = itemStorage.getItemById(id);
-        if (itemById!=null && itemById.getAuthor().equals(currentUser)){
+        if (itemById != null && itemById.getAuthor().equals(currentUser)) {
             itemStorage.deleteItemsById(id);
         } else {
             System.out.println("Սխալ ID!");

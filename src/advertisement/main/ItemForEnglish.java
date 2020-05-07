@@ -26,7 +26,7 @@ public class ItemForEnglish implements Commands {
         while (isRun) {
             try {
                 userStorage.initData();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             Commands.printMainCommandsEng();
@@ -71,12 +71,19 @@ public class ItemForEnglish implements Commands {
             user.setPhoneNumber(scanner.nextLine());
             System.out.print("Password: ");
             user.setPassword(scanner.nextLine());
-            userStorage.add(user);
-            System.out.println("\nThanks you are Registered!\n");
+            if (userStorage.getUser(user.getPhoneNumber())!=null){
+                System.out.println("User with Phone Number: "+user.getPhoneNumber()+" already exists");
+                registerUser();
+            } else {
+                userStorage.add(user);
+                System.out.println("\nThanks you are Registered!\n");
+                userStorage.printUsers();
+            }
         } catch (Exception e) {
             System.out.println("Invalid data!");
             registerUser();
         }
+
     }
 
     private static void loginUser() {
@@ -92,7 +99,7 @@ public class ItemForEnglish implements Commands {
         User user = userStorage.getUser(userPhone);
         if (user != null && user.getPassword().equals(userPassword)) {
             currentUser = user;
-            System.out.println("\nWelcome ! " + user.getName() + " " + user.getSurname()+"\n");
+            System.out.println("\nWelcome ! " + user.getName() + " " + user.getSurname() + "\n");
             loginedUser();
         } else {
             System.out.println("You entered wrong Phone Number or password, try again");
@@ -220,7 +227,7 @@ public class ItemForEnglish implements Commands {
         itemStorage.printAdsByUser(currentUser);
         long id = Long.parseLong(scanner.nextLine());
         Item itemById = itemStorage.getItemById(id);
-        if (itemById!=null && itemById.getAuthor().equals(currentUser)){
+        if (itemById != null && itemById.getAuthor().equals(currentUser)) {
             itemStorage.deleteItemsById(id);
         } else {
             System.out.println("Wrong Id");

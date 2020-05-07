@@ -42,9 +42,9 @@ public class ItemStorage {
         if (!file.exists()) {
             boolean newFile = file.createNewFile();
             if (newFile) {
-                System.out.println("In package <dataFiles> was created file <ItemData.txt>");
+                System.out.println("Item data will be saved in storage");
             } else {
-                System.err.println("Something went wrong! File was not created");
+                System.err.println("Something went wrong!! Catch errors and restart program");
             }
         } else {
             items = ItemFileUtil.deserializeItemList();

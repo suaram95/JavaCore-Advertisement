@@ -9,7 +9,7 @@ public class User implements Serializable {
     private Gender gender;
     private int age;
     private String phoneNumber;
-    private transient String password;
+    private String password;
 
     public User(String name, String surname, Gender gender, int age, String phoneNumber, String password) {
         this.name = name;

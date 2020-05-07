@@ -24,7 +24,7 @@ public class ItemForRussian implements Commands {
     public static void mainPart() {
         try {
             userStorage.initData();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         boolean isRun = true;
@@ -71,8 +71,14 @@ public class ItemForRussian implements Commands {
             user.setPhoneNumber(scanner.nextLine());
             System.out.print("Пароль: ");
             user.setPassword(scanner.nextLine());
-            userStorage.add(user);
-            System.out.println("\nСпасибо вы зарегистрированы!\n");
+            if (userStorage.getUser(user.getPhoneNumber())!=null){
+                System.out.println("Пользователь с Тел.Номером: "+user.getPhoneNumber()+" уже существует");
+                registerUser();
+            } else {
+                userStorage.add(user);
+                System.out.println("\nСпасибо вы зарегистрированы!\n");
+                userStorage.printUsers();
+            }
         } catch (Exception e) {
             System.out.println("Недействительные данные!");
             registerUser();
@@ -92,7 +98,7 @@ public class ItemForRussian implements Commands {
         User user = userStorage.getUser(userPhone);
         if (user != null && user.getPassword().equals(userPassword)) {
             currentUser = user;
-            System.out.println("\nДобро Пажаловать ! " + user.getName() + " " + user.getSurname()+"\n");
+            System.out.println("\nДобро Пажаловать ! " + user.getName() + " " + user.getSurname() + "\n");
             loginedUser();
         } else {
             System.out.println("Вы ввели неправилний Тел.Номер или Пароль, попробуйте снова");
@@ -220,7 +226,7 @@ public class ItemForRussian implements Commands {
         itemStorage.printAdsByUser(currentUser);
         long id = Long.parseLong(scanner.nextLine());
         Item itemById = itemStorage.getItemById(id);
-        if (itemById!=null && itemById.getAuthor().equals(currentUser)){
+        if (itemById != null && itemById.getAuthor().equals(currentUser)) {
             itemStorage.deleteItemsById(id);
         } else {
             System.out.println("Неверний ID!");
