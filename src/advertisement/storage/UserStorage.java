@@ -1,10 +1,8 @@
 package advertisement.storage;
 
 import advertisement.model.User;
-import advertisement.util.UserFileUtil;
+import advertisement.util.FileUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,27 +12,12 @@ public class UserStorage {
 
     public void add(User user) {
         userMap.put(user.getPhoneNumber(), user);
-        try {
-            UserFileUtil.seializeUserMap(userMap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtil.serializeUserMap(userMap);
     }
 
 
-    public void initData() throws IOException, ClassNotFoundException {
-        File file = new File("D:\\Aram\\IT Space LLC\\My Projects\\JavaCore-Advertisement\\src\\advertisement\\util\\dataFiles\\UserData.txt");
-        if (!file.exists()) {
-            boolean newFile = file.createNewFile();
-            if (newFile){
-                System.out.println("Your data will be saved in storage");
-            } else {
-                System.err.println("Something went wrong!! Catch errors and restart program");
-            }
-        } else {
-            userMap = UserFileUtil.deserializeUserMap();
-        }
-
+    public void initData(){
+        userMap = FileUtil.deserializeUserMap();
     }
 
     public User getUser(String phoneNumber) {

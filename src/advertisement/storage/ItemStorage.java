@@ -2,10 +2,8 @@ package advertisement.storage;
 
 import advertisement.exceptions.ModelNotFoundException;
 import advertisement.model.*;
-import advertisement.util.ItemFileUtil;
+import advertisement.util.FileUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,11 +19,7 @@ public class ItemStorage {
     public void add(Item item) {
         item.setId(itemId++);
         items.add(item);
-        try {
-            ItemFileUtil.seializeItemList(items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtil.serializeItemList(items);
     }
 
     public Item getItemById(long id) {
@@ -37,24 +31,14 @@ public class ItemStorage {
         return null;
     }
 
-    public void initData() throws IOException, ClassNotFoundException {
-        File file = new File("D:\\Aram\\IT Space LLC\\My Projects\\JavaCore-Advertisement\\src\\advertisement\\util\\dataFiles\\ItemData.txt");
-        if (!file.exists()) {
-            boolean newFile = file.createNewFile();
-            if (newFile) {
-                System.out.println("Item data will be saved in storage");
-            } else {
-                System.err.println("Something went wrong!! Catch errors and restart program");
-            }
-        } else {
-            items = ItemFileUtil.deserializeItemList();
+    public void initData(){
+        items = FileUtil.deserializeItemList();
+        if (this.items != null && !this.items.isEmpty()) {
+            Item item = this.items.get(this.items.size() - 1);
+            itemId = item.getId() + 1;
         }
     }
 
-
-    public boolean isEmpty() {
-        return this.items.isEmpty();
-    }
 
     public List<Item> getItems() {
         return this.items;
@@ -105,21 +89,13 @@ public class ItemStorage {
                 iterator.remove();
             }
         }
-        try {
-            ItemFileUtil.seializeItemList(items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtil.serializeItemList(items);
 //        items.removeIf(item -> item.getUser().equals(user));
     }
 
     public void deleteItemsById(long id) {
         items.remove(getItemById(id));
-        try {
-            ItemFileUtil.seializeItemList(items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtil.serializeItemList(items);
     }
 
 

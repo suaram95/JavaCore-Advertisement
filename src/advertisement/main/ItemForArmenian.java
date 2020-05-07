@@ -71,8 +71,8 @@ public class ItemForArmenian implements Commands {
             user.setPhoneNumber(scanner.nextLine());
             System.out.print("Գաղտնաբառ: ");
             user.setPassword(scanner.nextLine());
-            if (userStorage.getUser(user.getPhoneNumber())!=null){
-                System.out.println(user.getPhoneNumber()+"հեռախոսահամարով օգտատեր արդեն գոյութոյւն ունի");
+            if (userStorage.getUser(user.getPhoneNumber()) != null) {
+                System.out.println(user.getPhoneNumber() + "հեռախոսահամարով օգտատեր արդեն գոյութոյւն ունի");
                 registerUser();
             } else {
                 userStorage.add(user);
@@ -110,11 +110,9 @@ public class ItemForArmenian implements Commands {
     }
 
     private static void loginedUser() {
-        try {
-            itemStorage.initData();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        itemStorage.initData();
+
         boolean isRun = true;
         while (isRun) {
             Commands.printUserCommandsArm();

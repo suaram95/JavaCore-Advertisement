@@ -22,11 +22,8 @@ public class ItemForRussian implements Commands {
     private static User currentUser;
 
     public static void mainPart() {
-        try {
-            userStorage.initData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        userStorage.initData();
+
         boolean isRun = true;
         while (isRun) {
             Commands.printMainCommandsRus();
@@ -71,8 +68,8 @@ public class ItemForRussian implements Commands {
             user.setPhoneNumber(scanner.nextLine());
             System.out.print("Пароль: ");
             user.setPassword(scanner.nextLine());
-            if (userStorage.getUser(user.getPhoneNumber())!=null){
-                System.out.println("Пользователь с Тел.Номером: "+user.getPhoneNumber()+" уже существует");
+            if (userStorage.getUser(user.getPhoneNumber()) != null) {
+                System.out.println("Пользователь с Тел.Номером: " + user.getPhoneNumber() + " уже существует");
                 registerUser();
             } else {
                 userStorage.add(user);
@@ -107,11 +104,9 @@ public class ItemForRussian implements Commands {
     }
 
     private static void loginedUser() {
-        try {
-            itemStorage.initData();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        itemStorage.initData();
+
         boolean isRun = true;
         while (isRun) {
             Commands.printUserCommandsRus();

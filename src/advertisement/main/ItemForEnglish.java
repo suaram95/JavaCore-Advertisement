@@ -24,11 +24,9 @@ public class ItemForEnglish implements Commands {
     public static void mainPart() {
         boolean isRun = true;
         while (isRun) {
-            try {
-                userStorage.initData();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+            userStorage.initData();
+
             Commands.printMainCommandsEng();
             int command;
             try {
@@ -71,8 +69,8 @@ public class ItemForEnglish implements Commands {
             user.setPhoneNumber(scanner.nextLine());
             System.out.print("Password: ");
             user.setPassword(scanner.nextLine());
-            if (userStorage.getUser(user.getPhoneNumber())!=null){
-                System.out.println("User with Phone Number: "+user.getPhoneNumber()+" already exists");
+            if (userStorage.getUser(user.getPhoneNumber()) != null) {
+                System.out.println("User with Phone Number: " + user.getPhoneNumber() + " already exists");
                 registerUser();
             } else {
                 userStorage.add(user);
@@ -109,11 +107,9 @@ public class ItemForEnglish implements Commands {
     }
 
     private static void loginedUser() {
-        try {
-            itemStorage.initData();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        itemStorage.initData();
+
         boolean isRun = true;
         while (isRun) {
             Commands.printUserCommandsEng();
