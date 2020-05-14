@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class FileUtil {
 
-    private static final String USER_MAP_PATH = "src\\resources\\userMap.data";
-    private static final String ITEM_LIST_PATH = "src\\resources\\itemList.data";
+    private static final String USER_MAP_PATH = "src\\main\\resources\\userMap.data";
+    private static final String ITEM_LIST_PATH = "src\\main\\resources\\itemList.data";
 
     //User serialization
     public static void serializeUserMap(Map<String, User> userMap) {
@@ -20,7 +20,6 @@ public class FileUtil {
         try {
             if (!userMapFile.exists()) {
                 userMapFile.createNewFile();
-                System.out.println("Your data will be saved in storage");
             }
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(USER_MAP_PATH))) {
                 objectOutputStream.writeObject(userMap);
@@ -52,7 +51,6 @@ public class FileUtil {
         try {
             if (!itemListFile.exists()) {
                 itemListFile.createNewFile();
-                System.out.println("Item data will be saved in storage");
             }
             try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(ITEM_LIST_PATH))) {
                 objectOutputStream.writeObject(items);

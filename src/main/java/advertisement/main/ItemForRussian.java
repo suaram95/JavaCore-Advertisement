@@ -7,6 +7,11 @@ import advertisement.model.Gender;
 import advertisement.model.User;
 import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class ItemForArmenian implements Commands {
+public class ItemForRussian implements Commands {
 
     private static Scanner scanner = new Scanner(System.in);
     private static ItemStorage itemStorage = new ItemStorage();
@@ -22,14 +27,11 @@ public class ItemForArmenian implements Commands {
     private static User currentUser;
 
     public static void mainPart() {
-        try {
-            userStorage.initData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        userStorage.initData();
+
         boolean isRun = true;
         while (isRun) {
-            Commands.printMainCommandsArm();
+            Commands.printMainCommandsRus();
             int command;
             try {
                 command = Integer.parseInt(scanner.nextLine());
@@ -39,7 +41,7 @@ public class ItemForArmenian implements Commands {
             switch (command) {
                 case EXIT:
                     isRun = false;
-                    System.out.println("Ծրագիրը փակված է");
+                    System.out.println("Программа закрыта");
                     break;
                 case LOGIN:
                     loginUser();
@@ -47,66 +49,101 @@ public class ItemForArmenian implements Commands {
                 case REGISTER:
                     registerUser();
                     break;
+                case IMPORT_USERS:
+                    importUsersFromFile();
+                    break;
                 default:
-                    System.err.println("Սխալ հրաման!!");
+                    System.err.println("Неверная команда!!");
             }
         }
     }
+
 
     //Main part
 
     private static void registerUser() {
-        System.out.println("Գրանցման համար լրացրեք տվյալները");
+        System.out.println("Вводите данные для регистрации");
         try {
             User user = new User();
-            System.out.print("Անուն: ");
+            System.out.print("Имя: ");
             user.setName(scanner.nextLine());
-            System.out.print("Ազգանուն: ");
+            System.out.print("Фамилия: ");
             user.setSurname(scanner.nextLine());
-            System.out.print("Սեռ (Արական կամ Իգական): ");
+            System.out.print("Пол (Мужской или Женский): ");
             user.setGender(Gender.valueOf(scanner.nextLine().toUpperCase()));
-            System.out.print("Տարիք: ");
+            System.out.print("Возраст: ");
             user.setAge(Integer.parseInt(scanner.nextLine()));
-            System.out.print("Հեռախոսահամար: ");
+            System.out.print("Тел.Номер: ");
             user.setPhoneNumber(scanner.nextLine());
-            System.out.print("Գաղտնաբառ: ");
+            System.out.print("Пароль: ");
             user.setPassword(scanner.nextLine());
             if (userStorage.getUser(user.getPhoneNumber()) != null) {
-                System.out.println(user.getPhoneNumber() + "հեռախոսահամարով օգտատեր արդեն գոյութոյւն ունի");
+                System.out.println("Пользователь с Тел.Номером: " + user.getPhoneNumber() + " уже существует");
                 registerUser();
             } else {
                 userStorage.add(user);
-                System.out.println("\nՇնորհակալություն դուք գրանցված եք!\n");
+                System.out.println("\nСпасибо вы зарегистрированы!\n");
                 userStorage.printUsers();
             }
         } catch (Exception e) {
-            System.out.println("Սխալ տվյալ!");
+            System.out.println("Недействительные данные!");
             registerUser();
         }
+    }
 
+    private static void importUsersFromFile() {
+        System.out.println("Введите адрес файла");
+        String filePath = scanner.nextLine();
+        try {
+            XSSFWorkbook workbook=new XSSFWorkbook(filePath);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            int lastRowNum = sheet.getLastRowNum();
+            for (int i = 0; i <=lastRowNum ; i++) {
+                Row row= sheet.getRow(i);
+                String name = row.getCell(0).getStringCellValue();
+                String surname = row.getCell(1).getStringCellValue();
+                Gender gender=Gender.valueOf(row.getCell(2).getStringCellValue().toUpperCase());
+                double age=row.getCell(3).getNumericCellValue();
+
+                Cell phoneNumber=row.getCell(4);
+                String phoneNumberStr=phoneNumber.getCellType()== CellType.NUMERIC?
+                        String.valueOf(row.getCell(4).getNumericCellValue()): row.getCell(4).getStringCellValue();
+                String password = row.getCell(5).getStringCellValue();
+
+                User user=new User();
+                user.setName(name);
+                user.setSurname(surname);
+                user.setGender(gender);
+                user.setAge(Double.valueOf(age).intValue());
+                user.setPhoneNumber(phoneNumberStr);
+                user.setPassword(password);
+                userStorage.add(user);
+                System.out.println("Импорт удался!");
+            }
+        } catch (IOException e) {
+            System.out.println("Импорт файла не удался");
+        }
     }
 
     private static void loginUser() {
         if (userStorage.isEmty()) {
-            System.out.println("Խնդրում ենք սկզբից գրանցվեք!");
+            System.out.println("Пожалуйста сперва регистрируйтесь!");
             registerUser();
         }
-        System.out.println("Խնդրում ենք մուտքագրել Հեռախոսահամարը և Գաղտնաբառը");
-        System.out.print("Հեռախոսահամար: ");
+        System.out.println("Пожалуйста введите Тел.Номер и Пароль для входа");
+        System.out.print("Тел.Номер: ");
         String userPhone = scanner.nextLine();
-        System.out.print("Գաղտանաբառ: ");
+        System.out.print("Пароль: ");
         String userPassword = scanner.nextLine();
         User user = userStorage.getUser(userPhone);
         if (user != null && user.getPassword().equals(userPassword)) {
             currentUser = user;
-            System.out.println("\nԲարի Գալուստ ! " + user.getName() + " " + user.getSurname() + "\n");
+            System.out.println("\nДобро Пажаловать ! " + user.getName() + " " + user.getSurname() + "\n");
             loginedUser();
         } else {
-            System.out.println("Մուտքագրված Հեռախոսահամարը կամ գաղտնաբառը սխալ է, կրկին փորձեք");
+            System.out.println("Вы ввели неправилний Тел.Номер или Пароль, попробуйте снова");
             loginUser();
         }
-
-
     }
 
     private static void loginedUser() {
@@ -115,7 +152,7 @@ public class ItemForArmenian implements Commands {
 
         boolean isRun = true;
         while (isRun) {
-            Commands.printUserCommandsArm();
+            Commands.printUserCommandsRus();
             int command;
             try {
                 command = Integer.parseInt(scanner.nextLine());
@@ -146,13 +183,13 @@ public class ItemForArmenian implements Commands {
                     break;
                 case DELETE_MY_ALL_ADS:
                     itemStorage.deleteAdsByAuthor(currentUser);
-                    System.out.println("Բոլոր հայտարարությունները հեռացված են!");
+                    System.out.println("Все обьявления удалены!");
                     break;
                 case DELETE_AD_BY_TITLE:
                     deleteById();
                     break;
                 default:
-                    System.err.println("Սխալ հրաման!!");
+                    System.err.println("Неверная команда!!");
             }
         }
     }
@@ -160,42 +197,42 @@ public class ItemForArmenian implements Commands {
     //User part
 
     private static void add() {
-        System.out.println("Հայտարարությունը ավելացնելու համար լրացրեք հետևյալ դաշտերը");
-        System.out.println("Խնդրում ենք ընտրել կատեգորիան հետևյալ ցուցակից: " + Arrays.toString(Category.values()));
+        System.out.println("Для добавления обьявления заполните следуюшие поля");
+        System.out.println("Пожалуйста выберите категорию из этого листа: " + Arrays.toString(Category.values()));
         try {
             Item item = new Item();
             item.setAuthor(currentUser);
-            System.out.print("Կատեգորիա: ");
+            System.out.print("Категория: ");
             try {
                 item.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
             } catch (IllegalArgumentException e) {
-                System.out.println("Սխալ կատեգորիա!");
+                System.out.println("Неверная категория!");
                 add();
             }
-            System.out.print("Վերանգիր: ");
+            System.out.print("Заголовка: ");
             item.setTitle(scanner.nextLine());
-            System.out.print("Տեքստ: ");
+            System.out.print("Текст: ");
             item.setText(scanner.nextLine());
-            System.out.print("Գին: ");
+            System.out.print("Цена: ");
             item.setPrice(Double.parseDouble(scanner.nextLine()));
             item.setCreatedDate(new Date());
             itemStorage.add(item);
             itemStorage.print();
         } catch (Exception e) {
-            System.out.println("Սխալ տվյալ!");
+            System.out.println("Неверная команда!!");
             add();
         }
     }
 
     private static void printByCategory() {
-        System.out.println("Խնդրում ենք ընտրել կատեգորիան հետևյալ ցուցակից: " + Arrays.toString(Category.values()));
+        System.out.println("Пожалуйста выберите категорию из этого листа: " + Arrays.toString(Category.values()));
         try {
             Category category = Category.valueOf(scanner.nextLine().toUpperCase());
             itemStorage.getByCategory(category);
         } catch (ModelNotFoundException e) {
             e.getMessage();
         } catch (IllegalArgumentException e) {
-            System.out.println("Մուտքագրված կատեգորիան գոյություն չունի!!");
+            System.out.println("Введенная категория не сушествует!!");
             printByCategory();
         }
     }
@@ -205,7 +242,7 @@ public class ItemForArmenian implements Commands {
         if (sortedListByDate.size() >= 2) {
             itemStorage.sortAdsByDate();
         } else {
-            System.out.println("Դուք ավելացրել եք միայն մեկ հայտարարություն, խնդրում ենք ավելացնել մեկ ուրիշը, տեսակավորելու համար");
+            System.out.println("Вы добавили только одно обьявление, пожалуйста добавьте еще одну для сортировки");
             add();
         }
     }
@@ -215,21 +252,22 @@ public class ItemForArmenian implements Commands {
         if (sortedListByTitle.size() >= 2) {
             itemStorage.sortAdsByTitle();
         } else {
-            System.out.println("Դուք ավելացրել եք միայն մեկ հայտարարություն, խնդրում ենք ավելացնել մեկ ուրիշը, տեսակավորելու համար");
+            System.out.println("Вы добавили только одно обьявление, пожалуйста добавьте еще одну для сортировки");
             add();
         }
     }
 
 
     private static void deleteById() {
-        System.out.println("Մուտքագրեք հայտարարության ID-ն, այն ջնջելու համար");
+
+        System.out.println("Вводите ID обьявления для удаления");
         itemStorage.printAdsByUser(currentUser);
         long id = Long.parseLong(scanner.nextLine());
         Item itemById = itemStorage.getItemById(id);
         if (itemById != null && itemById.getAuthor().equals(currentUser)) {
             itemStorage.deleteItemsById(id);
         } else {
-            System.out.println("Սխալ ID!");
+            System.out.println("Неверний ID!");
         }
     }
 

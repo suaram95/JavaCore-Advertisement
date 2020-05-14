@@ -1,12 +1,17 @@
 package advertisement.main;
 
 import advertisement.exceptions.ModelNotFoundException;
-import advertisement.model.Item;
 import advertisement.model.Category;
 import advertisement.model.Gender;
+import advertisement.model.Item;
 import advertisement.model.User;
 import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class ItemForRussian implements Commands {
+public class ItemForEnglish implements Commands {
 
     private static Scanner scanner = new Scanner(System.in);
     private static ItemStorage itemStorage = new ItemStorage();
@@ -22,11 +27,12 @@ public class ItemForRussian implements Commands {
     private static User currentUser;
 
     public static void mainPart() {
-        userStorage.initData();
-
         boolean isRun = true;
         while (isRun) {
-            Commands.printMainCommandsRus();
+
+            userStorage.initData();
+
+            Commands.printMainCommandsEng();
             int command;
             try {
                 command = Integer.parseInt(scanner.nextLine());
@@ -36,7 +42,7 @@ public class ItemForRussian implements Commands {
             switch (command) {
                 case EXIT:
                     isRun = false;
-                    System.out.println("Программа закрыта");
+                    System.out.println("Program was closed");
                     break;
                 case LOGIN:
                     loginUser();
@@ -44,8 +50,11 @@ public class ItemForRussian implements Commands {
                 case REGISTER:
                     registerUser();
                     break;
+                case IMPORT_USERS:
+                    importUsersFromFile();
+                    break;
                 default:
-                    System.err.println("Неверная команда!!");
+                    System.err.println("Wrong Command!!");
             }
         }
     }
@@ -53,55 +62,102 @@ public class ItemForRussian implements Commands {
     //Main part
 
     private static void registerUser() {
-        System.out.println("Вводите данные для регистрации");
+        System.out.println("Input data for Registration");
         try {
             User user = new User();
-            System.out.print("Имя: ");
+            System.out.print("Name: ");
             user.setName(scanner.nextLine());
-            System.out.print("Фамилия: ");
+            System.out.print("Surname: ");
             user.setSurname(scanner.nextLine());
-            System.out.print("Пол (Мужской или Женский): ");
+            System.out.print("Gender (Male or Female): ");
             user.setGender(Gender.valueOf(scanner.nextLine().toUpperCase()));
-            System.out.print("Возраст: ");
+            System.out.print("Age: ");
             user.setAge(Integer.parseInt(scanner.nextLine()));
-            System.out.print("Тел.Номер: ");
+            System.out.print("Phone Number: ");
             user.setPhoneNumber(scanner.nextLine());
-            System.out.print("Пароль: ");
+            System.out.print("Password: ");
             user.setPassword(scanner.nextLine());
             if (userStorage.getUser(user.getPhoneNumber()) != null) {
-                System.out.println("Пользователь с Тел.Номером: " + user.getPhoneNumber() + " уже существует");
+                System.out.println("User with Phone Number: " + user.getPhoneNumber() + " already exists");
                 registerUser();
             } else {
                 userStorage.add(user);
-                System.out.println("\nСпасибо вы зарегистрированы!\n");
+                System.out.println("\nThanks you are Registered!\n");
                 userStorage.printUsers();
             }
         } catch (Exception e) {
-            System.out.println("Недействительные данные!");
+            System.out.println("Invalid data!");
             registerUser();
         }
+
+    }
+
+    private static void importUsersFromFile() {
+        System.out.println("Please select file path to import users data");
+        String filePath  = scanner.nextLine();
+        try {
+            XSSFWorkbook workbook=new XSSFWorkbook(filePath);
+            Sheet sheet = workbook.getSheetAt(0);
+            int lastRowNum = sheet.getLastRowNum();
+            for (int i = 1; i <=lastRowNum ; i++) {
+                Row row = sheet.getRow(i);
+                String name = row.getCell(0).getStringCellValue();
+                String surname = row.getCell(1).getStringCellValue();
+                Gender gender = Gender.valueOf(row.getCell(2).getStringCellValue().toUpperCase());
+                double age = row.getCell(3).getNumericCellValue();
+
+                Cell phoneNumber = row.getCell(4);
+                String phoneNumberStr = phoneNumber.getCellType() == CellType.NUMERIC ?
+                        String.valueOf(row.getCell(4).getNumericCellValue()) : row.getCell(4).getStringCellValue();
+
+//                Cell password= row.getCell(5);
+//                String passwordStr = password.getCellType() == CellType.NUMERIC ?
+//                        String.valueOf(row.getCell(5).getNumericCellValue()) : row.getCell(5).getStringCellValue();
+                String password = row.getCell(5).getStringCellValue();
+
+                User user=new User();
+                user.setName(name);
+                user.setSurname(surname);
+                user.setGender(gender);
+                user.setAge(Double.valueOf(age).intValue());
+                user.setPhoneNumber(phoneNumberStr );
+                user.setPassword(password);
+
+                System.out.println(user);
+                userStorage.add(user);
+            }
+            System.out.println("Import was success!!");
+        } catch (IOException e) {
+            System.out.println("Error while importing users");
+        }
+
+
     }
 
     private static void loginUser() {
         if (userStorage.isEmty()) {
-            System.out.println("Пожалуйста сперва регистрируйтесь!");
+            System.out.println("Please Register first!");
             registerUser();
         }
-        System.out.println("Пожалуйста введите Тел.Номер и Пароль для входа");
-        System.out.print("Тел.Номер: ");
+        System.out.println("\nPlease input Phone Number & Password to Login");
+        System.out.print("Phone Number: ");
         String userPhone = scanner.nextLine();
-        System.out.print("Пароль: ");
+        System.out.print("Password: ");
         String userPassword = scanner.nextLine();
         User user = userStorage.getUser(userPhone);
         if (user != null && user.getPassword().equals(userPassword)) {
             currentUser = user;
-            System.out.println("\nДобро Пажаловать ! " + user.getName() + " " + user.getSurname() + "\n");
+            System.out.println("\nWelcome ! " + user.getName() + " " + user.getSurname() + "\n");
             loginedUser();
         } else {
-            System.out.println("Вы ввели неправилний Тел.Номер или Пароль, попробуйте снова");
+
+            System.out.println("You entered wrong Phone Number or password, try again");
             loginUser();
         }
+
     }
+
+
 
     private static void loginedUser() {
 
@@ -109,7 +165,7 @@ public class ItemForRussian implements Commands {
 
         boolean isRun = true;
         while (isRun) {
-            Commands.printUserCommandsRus();
+            Commands.printUserCommandsEng();
             int command;
             try {
                 command = Integer.parseInt(scanner.nextLine());
@@ -140,13 +196,13 @@ public class ItemForRussian implements Commands {
                     break;
                 case DELETE_MY_ALL_ADS:
                     itemStorage.deleteAdsByAuthor(currentUser);
-                    System.out.println("Все обьявления удалены!");
+                    System.out.println("All advertisements are deleted!");
                     break;
                 case DELETE_AD_BY_TITLE:
                     deleteById();
                     break;
                 default:
-                    System.err.println("Неверная команда!!");
+                    System.err.println("Wrong Command!!");
             }
         }
     }
@@ -154,42 +210,42 @@ public class ItemForRussian implements Commands {
     //User part
 
     private static void add() {
-        System.out.println("Для добавления обьявления заполните следуюшие поля");
-        System.out.println("Пожалуйста выберите категорию из этого листа: " + Arrays.toString(Category.values()));
+        System.out.println("To add an advertisement fill in the fields below.");
+        System.out.println("Please choose category name from list: " + Arrays.toString(Category.values()));
         try {
             Item item = new Item();
             item.setAuthor(currentUser);
-            System.out.print("Категория: ");
+            System.out.print("Category: ");
             try {
                 item.setCategory(Category.valueOf(scanner.nextLine().toUpperCase()));
             } catch (IllegalArgumentException e) {
-                System.out.println("Неверная категория!");
+                System.out.println("Invalid category!");
                 add();
             }
-            System.out.print("Заголовка: ");
+            System.out.print("Title: ");
             item.setTitle(scanner.nextLine());
-            System.out.print("Текст: ");
+            System.out.print("Text: ");
             item.setText(scanner.nextLine());
-            System.out.print("Цена: ");
+            System.out.print("Price: ");
             item.setPrice(Double.parseDouble(scanner.nextLine()));
             item.setCreatedDate(new Date());
             itemStorage.add(item);
             itemStorage.print();
         } catch (Exception e) {
-            System.out.println("Неверная команда!!");
+            System.out.println("Invalid data!");
             add();
         }
     }
 
     private static void printByCategory() {
-        System.out.println("Пожалуйста выберите категорию из этого листа: " + Arrays.toString(Category.values()));
+        System.out.println("Please choose category name from list: " + Arrays.toString(Category.values()));
         try {
             Category category = Category.valueOf(scanner.nextLine().toUpperCase());
             itemStorage.getByCategory(category);
         } catch (ModelNotFoundException e) {
             e.getMessage();
         } catch (IllegalArgumentException e) {
-            System.out.println("Введенная категория не сушествует!!");
+            System.out.println("Entered category does not exist!!");
             printByCategory();
         }
     }
@@ -199,7 +255,7 @@ public class ItemForRussian implements Commands {
         if (sortedListByDate.size() >= 2) {
             itemStorage.sortAdsByDate();
         } else {
-            System.out.println("Вы добавили только одно обьявление, пожалуйста добавьте еще одну для сортировки");
+            System.out.println("You added only one advertisement, please add another for sorting");
             add();
         }
     }
@@ -209,22 +265,21 @@ public class ItemForRussian implements Commands {
         if (sortedListByTitle.size() >= 2) {
             itemStorage.sortAdsByTitle();
         } else {
-            System.out.println("Вы добавили только одно обьявление, пожалуйста добавьте еще одну для сортировки");
+            System.out.println("You added only one advertisement, please add another for sorting");
             add();
         }
     }
 
 
     private static void deleteById() {
-
-        System.out.println("Вводите ID обьявления для удаления");
+        System.out.println("Input Advertisement ID to delete");
         itemStorage.printAdsByUser(currentUser);
         long id = Long.parseLong(scanner.nextLine());
         Item itemById = itemStorage.getItemById(id);
         if (itemById != null && itemById.getAuthor().equals(currentUser)) {
             itemStorage.deleteItemsById(id);
         } else {
-            System.out.println("Неверний ID!");
+            System.out.println("Wrong Id");
         }
     }
 

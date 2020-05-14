@@ -10,6 +10,7 @@ public interface Commands {
 
     int LOGIN = 1;
     int REGISTER = 2;
+    int IMPORT_USERS = 3;
 
     int LOGOUT = 0;
     int ADD_NEW_AD = 1;
@@ -29,9 +30,9 @@ public interface Commands {
         System.out.println("For English input: " + ENGLISH);
         System.out.println("Для русского языка нажмите: " + RUSSIAN);
         System.out.println("----------------------------------------");
-        System.out.println("Դուրս գալու համար սեղմեք: "+EXIT);
-        System.out.println("For Exit input: "+EXIT);
-        System.out.println("Для выхода нажмите: "+EXIT);
+        System.out.println("Դուրս գալու համար սեղմեք: " + EXIT);
+        System.out.println("For Exit input: " + EXIT);
+        System.out.println("Для выхода нажмите: " + EXIT);
     }
 
 
@@ -41,6 +42,7 @@ public interface Commands {
         System.out.println("Սեղմեք " + EXIT + " Ելքի համար");
         System.out.println("Սեղմեք " + LOGIN + " Մուտք գործելու համար");
         System.out.println("Սեղմեք " + REGISTER + " Գրանցման համար");
+        System.out.println("Սեղմեք " + IMPORT_USERS + " Օգտագործողների տվյալները ներբեռնելու համար");
     }
 
     static void printUserCommandsArm() {
@@ -58,10 +60,12 @@ public interface Commands {
 
     //English part
 
-    static void printMainCommandsEng(){
-        System.out.println("Input "+EXIT+" to Exit");
-        System.out.println("Input "+LOGIN+" to Login");
-        System.out.println("Input "+REGISTER+" to Register");
+    static void printMainCommandsEng() {
+        System.out.println("Input " + EXIT + " to Exit");
+        System.out.println("Input " + LOGIN + " to Login");
+        System.out.println("Input " + REGISTER + " to Register");
+        System.out.println("Input " + IMPORT_USERS + " to Import Users");
+
     }
 
     static void printUserCommandsEng() {
@@ -78,10 +82,12 @@ public interface Commands {
 
     //Russian part
 
-    static void printMainCommandsRus(){
-        System.out.println("Нажмите "+EXIT+" для Выхода");
-        System.out.println("Нажмите "+LOGIN+" чтобы Войти");
-        System.out.println("Нажмите "+REGISTER+" для Регистрации");
+    static void printMainCommandsRus() {
+        System.out.println("Нажмите " + EXIT + " для Выхода");
+        System.out.println("Нажмите " + LOGIN + " чтобы Войти");
+        System.out.println("Нажмите " + REGISTER + " для Регистрации");
+        System.out.println("Нажмите " + IMPORT_USERS + " чтобы импортировать данные пользователей");
+
     }
 
     static void printUserCommandsRus() {
