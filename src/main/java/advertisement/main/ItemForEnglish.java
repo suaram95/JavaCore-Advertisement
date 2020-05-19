@@ -7,13 +7,9 @@ import advertisement.model.Item;
 import advertisement.model.User;
 import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import advertisement.util.XLSXUtil;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -95,40 +91,9 @@ public class ItemForEnglish implements Commands {
     private static void importUsersFromFile() {
         System.out.println("Please select file path to import users data");
         String filePath  = scanner.nextLine();
-        try {
-            XSSFWorkbook workbook=new XSSFWorkbook(filePath);
-            Sheet sheet = workbook.getSheetAt(0);
-            int lastRowNum = sheet.getLastRowNum();
-            for (int i = 1; i <=lastRowNum ; i++) {
-                Row row = sheet.getRow(i);
-                String name = row.getCell(0).getStringCellValue();
-                String surname = row.getCell(1).getStringCellValue();
-                Gender gender = Gender.valueOf(row.getCell(2).getStringCellValue().toUpperCase());
-                double age = row.getCell(3).getNumericCellValue();
-
-                Cell phoneNumber = row.getCell(4);
-                String phoneNumberStr = phoneNumber.getCellType() == CellType.NUMERIC ?
-                        String.valueOf(row.getCell(4).getNumericCellValue()) : row.getCell(4).getStringCellValue();
-
-//                Cell password= row.getCell(5);
-//                String passwordStr = password.getCellType() == CellType.NUMERIC ?
-//                        String.valueOf(row.getCell(5).getNumericCellValue()) : row.getCell(5).getStringCellValue();
-                String password = row.getCell(5).getStringCellValue();
-
-                User user=new User();
-                user.setName(name);
-                user.setSurname(surname);
-                user.setGender(gender);
-                user.setAge(Double.valueOf(age).intValue());
-                user.setPhoneNumber(phoneNumberStr );
-                user.setPassword(password);
-
-                System.out.println(user);
-                userStorage.add(user);
-            }
-            System.out.println("Import was success!!");
-        } catch (IOException e) {
-            System.out.println("Error while importing users");
+        List<User> users = XLSXUtil.readUser(filePath);
+        for (User user : users) {
+            userStorage.add(user);
         }
 
 
@@ -176,29 +141,35 @@ public class ItemForEnglish implements Commands {
                 case LOGOUT:
                     isRun = false;
                     break;
-                case ADD_NEW_AD:
+                case ADD_NEW_ITEM:
                     add();
                     break;
-                case PRINT_MY_ALL_ADS:
+                case IMPORT_ITEMS:
+                    importItemsFromFile();
+                    break;
+                case EXPORT_ITEMS:
+                    exportItemstoFile();
+                    break;
+                case PRINT_MY_ALL_ITEMS:
                     itemStorage.printAdsByUser(currentUser);
                     break;
-                case PRINT_ALL_ADS:
+                case PRINT_ALL_ITEMS:
                     itemStorage.print();
                     break;
-                case PRINT_AD_BY_CATEGORY:
+                case PRINT_ITEMS_BY_CATEGORY:
                     printByCategory();
                     break;
-                case PRINT_ALL_ADS_BY_TITLE_SORT:
+                case PRINT_ALL_ITEMS_BY_TITLE_SORT:
                     sortAdsByTitle();
                     break;
-                case PRINT_ALL_ADS_BY_DATE_SORT:
+                case PRINT_ALL_ITEMS_BY_DATE_SORT:
                     sortAdsByDate();
                     break;
-                case DELETE_MY_ALL_ADS:
+                case DELETE_MY_ALL_ITEMS:
                     itemStorage.deleteAdsByAuthor(currentUser);
-                    System.out.println("All advertisements are deleted!");
+                    System.out.println("All items are deleted!");
                     break;
-                case DELETE_AD_BY_TITLE:
+                case DELETE_ITEM_BY_TITLE:
                     deleteById();
                     break;
                 default:
@@ -207,10 +178,12 @@ public class ItemForEnglish implements Commands {
         }
     }
 
+
+
     //User part
 
     private static void add() {
-        System.out.println("To add an advertisement fill in the fields below.");
+        System.out.println("To add an item fill in the fields below.");
         System.out.println("Please choose category name from list: " + Arrays.toString(Category.values()));
         try {
             Item item = new Item();
@@ -237,6 +210,47 @@ public class ItemForEnglish implements Commands {
         }
     }
 
+
+    private static void importItemsFromFile() {
+        System.out.println("Please input excel file path");
+        String path  = scanner.nextLine();
+        File file = new File(path);
+        if (file.exists()&& file.isFile()){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<Item> items = XLSXUtil.readItems(path);
+                    for (Item item : items) {
+                        item.setAuthor(userStorage.getUser(item.getAuthor().getPhoneNumber()));
+                        itemStorage.add(item);
+                    }
+                }
+            }).start();
+            System.out.println("Import has success!");
+        } else {
+            System.out.println("Please input valid path");
+        }
+    }
+
+    private static void exportItemstoFile() {
+        System.out.println("Please input folder path");
+        String path  = scanner.nextLine();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(path);
+
+                if (file.exists()&& file.isDirectory()){
+                    XLSXUtil.writeItems(path,itemStorage.getItems());
+                } else {
+                    System.out.println("Please input valid path");
+                }
+            }
+        }).start();
+        System.out.println("Export has success!");
+    }
+
+
     private static void printByCategory() {
         System.out.println("Please choose category name from list: " + Arrays.toString(Category.values()));
         try {
@@ -255,7 +269,7 @@ public class ItemForEnglish implements Commands {
         if (sortedListByDate.size() >= 2) {
             itemStorage.sortAdsByDate();
         } else {
-            System.out.println("You added only one advertisement, please add another for sorting");
+            System.out.println("You added only one item, please add another for sorting");
             add();
         }
     }
@@ -265,14 +279,14 @@ public class ItemForEnglish implements Commands {
         if (sortedListByTitle.size() >= 2) {
             itemStorage.sortAdsByTitle();
         } else {
-            System.out.println("You added only one advertisement, please add another for sorting");
+            System.out.println("You added only one item, please add another for sorting");
             add();
         }
     }
 
 
     private static void deleteById() {
-        System.out.println("Input Advertisement ID to delete");
+        System.out.println("Input item ID to delete");
         itemStorage.printAdsByUser(currentUser);
         long id = Long.parseLong(scanner.nextLine());
         Item itemById = itemStorage.getItemById(id);

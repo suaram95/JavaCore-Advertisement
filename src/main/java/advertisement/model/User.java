@@ -1,10 +1,17 @@
 package advertisement.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.nio.file.FileStore;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
 
     private String name;
@@ -13,6 +20,7 @@ public class User implements Serializable {
     private int age;
     private String phoneNumber;
     private String password;
+
 
 
 }

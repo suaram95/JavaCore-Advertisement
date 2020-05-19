@@ -7,12 +7,14 @@ import advertisement.model.Item;
 import advertisement.model.User;
 import advertisement.storage.ItemStorage;
 import advertisement.storage.UserStorage;
+import advertisement.util.XLSXUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -171,29 +173,35 @@ public class ItemForArmenian implements Commands {
                 case LOGOUT:
                     isRun = false;
                     break;
-                case ADD_NEW_AD:
+                case ADD_NEW_ITEM:
                     add();
                     break;
-                case PRINT_MY_ALL_ADS:
+                case IMPORT_ITEMS:
+                    importItemsFromFile();
+                    break;
+                case EXPORT_ITEMS:
+                    exportItemstoFile();
+                    break;
+                case PRINT_MY_ALL_ITEMS:
                     itemStorage.printAdsByUser(currentUser);
                     break;
-                case PRINT_ALL_ADS:
+                case PRINT_ALL_ITEMS:
                     itemStorage.print();
                     break;
-                case PRINT_AD_BY_CATEGORY:
+                case PRINT_ITEMS_BY_CATEGORY:
                     printByCategory();
                     break;
-                case PRINT_ALL_ADS_BY_TITLE_SORT:
+                case PRINT_ALL_ITEMS_BY_TITLE_SORT:
                     sortAdsByTitle();
                     break;
-                case PRINT_ALL_ADS_BY_DATE_SORT:
+                case PRINT_ALL_ITEMS_BY_DATE_SORT:
                     sortAdsByDate();
                     break;
-                case DELETE_MY_ALL_ADS:
+                case DELETE_MY_ALL_ITEMS:
                     itemStorage.deleteAdsByAuthor(currentUser);
                     System.out.println("Բոլոր հայտարարությունները հեռացված են!");
                     break;
-                case DELETE_AD_BY_TITLE:
+                case DELETE_ITEM_BY_TITLE:
                     deleteById();
                     break;
                 default:
@@ -201,6 +209,8 @@ public class ItemForArmenian implements Commands {
             }
         }
     }
+
+
 
     //User part
 
@@ -230,6 +240,45 @@ public class ItemForArmenian implements Commands {
             System.out.println("Սխալ տվյալ!");
             add();
         }
+    }
+
+    private static void importItemsFromFile() {
+        System.out.println("Խնդրում ենք մուտքագրել ֆայլի հասցեն");
+        String path  = scanner.nextLine();
+        File file = new File(path);
+        if (file.exists()&& file.isFile()){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<Item> items = XLSXUtil.readItems(path);
+                    for (Item item : items) {
+                        item.setAuthor(userStorage.getUser(item.getAuthor().getPhoneNumber()));
+                        itemStorage.add(item);
+                    }
+                }
+            }).start();
+            System.out.println("Ներբեռնումը հաջողվել է!");
+        } else {
+            System.out.println("Խնդրում ենք մուտքագրել ճիշտ հասցե");
+        }
+    }
+
+    private static void exportItemstoFile() {
+        System.out.println("Խնդրում ենք մուտքագրել թղթապանակի հասցեն");
+        String path  = scanner.nextLine();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(path);
+
+                if (file.exists()&& file.isDirectory()){
+                    XLSXUtil.writeItems(path,itemStorage.getItems());
+                } else {
+                    System.out.println("Խնդրում ենք մուտքագրել ճիշտ հասցե");
+                }
+            }
+        }).start();
+        System.out.println("Վերբեռնումը հաջողվել է!");
     }
 
     private static void printByCategory() {
