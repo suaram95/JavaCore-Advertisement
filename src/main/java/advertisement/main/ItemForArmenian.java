@@ -97,40 +97,12 @@ public class ItemForArmenian implements Commands {
 
 
     private static void importUsersFromFile() {
-        System.out.println("Մուտքագրեք ֆայլի հասցեն");
-        String filePath = scanner.nextLine();
-        try {
-            XSSFWorkbook workbook=new XSSFWorkbook(filePath);
-            Sheet sheet = workbook.getSheetAt(0);
-            int lastRowNum = sheet.getLastRowNum();
-            for (int i = 0; i <=lastRowNum; i++) {
-                Row row =sheet.getRow(i);
-                String name = row.getCell(0).getStringCellValue();
-                String surname = row.getCell(1).getStringCellValue();
-                Gender gender=Gender.valueOf(row.getCell(2).getStringCellValue().toUpperCase());
-                double age = row.getCell(3).getNumericCellValue();
-
-                Cell phoneNumber=row.getCell(4);
-                String phoneNumberStr = phoneNumber.getCellType()== CellType.NUMERIC ?
-                        String.valueOf(row.getCell(4).getNumericCellValue()): row.getCell(4).getStringCellValue();
-
-                String password = row.getCell(5).getStringCellValue();
-                User user=new User();
-                user.setName(name);
-                user.setSurname(surname);
-                user.setGender(gender);
-                user.setAge(Double.valueOf(age).intValue());
-                user.setPhoneNumber(phoneNumberStr);
-                user.setPassword(password);
-                System.out.println(user);
-                userStorage.add(user);
-            }
-            System.out.println("Ներբեռնումը հաջողվել է");
-
-        } catch (IOException e) {
-            System.out.println("Ներբեռնման ժամանակ տեղի է ունեցել սխալ");
+        System.out.println("Խնդրում ենք ընտրել ֆայլի հասցեն օգտատերերի տվյալները ներբեռնելու համար");
+        String filePath  = scanner.nextLine();
+        List<User> users = XLSXUtil.readUserArm(filePath);
+        for (User user : users) {
+            userStorage.add(user);
         }
-
     }
 
     private static void loginUser() {
@@ -250,7 +222,7 @@ public class ItemForArmenian implements Commands {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    List<Item> items = XLSXUtil.readItems(path);
+                    List<Item> items = XLSXUtil.readItemsArm(path);
                     for (Item item : items) {
                         item.setAuthor(userStorage.getUser(item.getAuthor().getPhoneNumber()));
                         itemStorage.add(item);
@@ -272,7 +244,7 @@ public class ItemForArmenian implements Commands {
                 File file = new File(path);
 
                 if (file.exists()&& file.isDirectory()){
-                    XLSXUtil.writeItems(path,itemStorage.getItems());
+                    XLSXUtil.writeItemsArm(path,itemStorage.getItems());
                 } else {
                     System.out.println("Խնդրում ենք մուտքագրել ճիշտ հասցե");
                 }

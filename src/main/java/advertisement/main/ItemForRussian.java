@@ -94,36 +94,11 @@ public class ItemForRussian implements Commands {
     }
 
     private static void importUsersFromFile() {
-        System.out.println("Введите адрес файла");
-        String filePath = scanner.nextLine();
-        try {
-            XSSFWorkbook workbook=new XSSFWorkbook(filePath);
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            int lastRowNum = sheet.getLastRowNum();
-            for (int i = 0; i <=lastRowNum ; i++) {
-                Row row= sheet.getRow(i);
-                String name = row.getCell(0).getStringCellValue();
-                String surname = row.getCell(1).getStringCellValue();
-                Gender gender=Gender.valueOf(row.getCell(2).getStringCellValue().toUpperCase());
-                double age=row.getCell(3).getNumericCellValue();
-
-                Cell phoneNumber=row.getCell(4);
-                String phoneNumberStr=phoneNumber.getCellType()== CellType.NUMERIC?
-                        String.valueOf(row.getCell(4).getNumericCellValue()): row.getCell(4).getStringCellValue();
-                String password = row.getCell(5).getStringCellValue();
-
-                User user=new User();
-                user.setName(name);
-                user.setSurname(surname);
-                user.setGender(gender);
-                user.setAge(Double.valueOf(age).intValue());
-                user.setPhoneNumber(phoneNumberStr);
-                user.setPassword(password);
-                userStorage.add(user);
-                System.out.println("Импорт удался!");
-            }
-        } catch (IOException e) {
-            System.out.println("Импорт файла не удался");
+        System.out.println("Введите адрес файла для импорта данных пользователей");
+        String filePath  = scanner.nextLine();
+        List<User> users = XLSXUtil.readUserRus(filePath);
+        for (User user : users) {
+            userStorage.add(user);
         }
     }
 
@@ -242,7 +217,7 @@ public class ItemForRussian implements Commands {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    List<Item> items = XLSXUtil.readItems(path);
+                    List<Item> items = XLSXUtil.readItemsRus(path);
                     for (Item item : items) {
                         item.setAuthor(userStorage.getUser(item.getAuthor().getPhoneNumber()));
                         itemStorage.add(item);
@@ -264,7 +239,7 @@ public class ItemForRussian implements Commands {
                 File file = new File(path);
 
                 if (file.exists()&& file.isDirectory()){
-                    XLSXUtil.writeItems(path,itemStorage.getItems());
+                    XLSXUtil.writeItemsRus(path,itemStorage.getItems());
                 } else {
                     System.out.println("Пожалуйста введите правильный адрес");
                 }

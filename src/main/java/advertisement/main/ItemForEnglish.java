@@ -95,8 +95,6 @@ public class ItemForEnglish implements Commands {
         for (User user : users) {
             userStorage.add(user);
         }
-
-
     }
 
     private static void loginUser() {

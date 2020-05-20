@@ -2,9 +2,7 @@ package advertisement.model;
 
 public enum Gender {
 
-    ԱՐԱԿԱՆ, ԻԳԱԿԱՆ,
-    MALE, FEMALE,
-    МУЖСКОЙ, ЖЕНСКИЙ
-
+    MALE, ԱՐԱԿԱՆ, МУЖСКОЙ,
+    FEMALE, ԻԳԱԿԱՆ, ЖЕНСКИЙ
 
 }

@@ -21,6 +21,14 @@ public class User implements Serializable {
     private String phoneNumber;
     private String password;
 
-
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", gender=" + gender +
+                ", age=" + age +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }
